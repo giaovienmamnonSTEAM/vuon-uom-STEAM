@@ -1,0 +1,15 @@
+{
+  "name": "vuon-uom-steam",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Vườn Ươm STEAM — Công cụ soạn giáo án STEAM mầm non theo quy trình 5E, EDP và Dự án STEAM.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.4.10"
+  }
+}
