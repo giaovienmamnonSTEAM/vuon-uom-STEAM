@@ -42,16 +42,58 @@ Trả về đúng JSON theo schema đã quy định.`;
   let raw = rawText.trim();
   raw = raw.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```\s*$/, '');
 
-  let parsed;
-  try {
-    parsed = JSON.parse(raw);
-  } catch (e) {
-    const m = raw.match(/\{[\s\S]*\}/);
-    if (m) {
-      parsed = JSON.parse(m[0]);
-    } else {
-      throw new Error('Không thể đọc dữ liệu giáo án trả về.');
+ function extractFirstJson(text) {
+  const start = text.indexOf('{');
+  if (start === -1) {
+    throw new Error('Không tìm thấy dữ liệu JSON giáo án.');
+  }
+
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+
+  for (let i = start; i < text.length; i++) {
+    const char = text[i];
+
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+
+    if (char === '\\' && inString) {
+      escaped = true;
+      continue;
+    }
+
+    if (char === '"') {
+      inString = !inString;
+      continue;
+    }
+
+    if (!inString) {
+      if (char === '{') depth++;
+
+      if (char === '}') {
+        depth--;
+
+        if (depth === 0) {
+          return text.slice(start, i + 1);
+        }
+      }
     }
   }
-  return parsed;
+
+  throw new Error('JSON giáo án chưa hoàn chỉnh.');
+}
+
+let parsed;
+
+try {
+  parsed = JSON.parse(raw);
+} catch (e) {
+  const jsonText = extractFirstJson(raw);
+  parsed = JSON.parse(jsonText);
+}
+
+return parsed;
 }
