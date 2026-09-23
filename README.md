@@ -43,7 +43,7 @@ Function), route này đọc key từ biến môi trường `ANTHROPIC_API_KEY` 
 Bạn cần tự cấp một API key Anthropic và khai báo biến môi trường này khi deploy
 (xem bước 3 bên dưới) — ứng dụng sẽ không tạo được giáo án nếu thiếu key.
 
-Lấy API key tại: https://console.anthropic.com/settings/keys (cần nạp tín dụng trong mục Billing; mỗi giáo án chi tiết tốn khoảng vài nghìn đồng tiền API).
+Lấy API key tại: https://console.anthropic.com/settings/keys (cần nạp tín dụng trong mục Billing; ước tính mỗi giáo án "Chi tiết" tốn khoảng 0,3–0,6 USD, bản "Vừa"/"Gọn" rẻ hơn).
 
 ---
 
