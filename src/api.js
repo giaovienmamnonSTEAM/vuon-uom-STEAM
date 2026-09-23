@@ -1,27 +1,13 @@
-import { SYSTEM_PROMPT } from './systemPrompt.js';
-
 /* ============ CALL API ============
-   Gọi tới serverless function /api/generate (xem file api/generate.js)
-   thay vì gọi trực tiếp Gemini API từ trình duyệt — để không
-   lộ GEMINI_API_KEY ra phía client.
+   Gọi tới serverless function /api/generate (api/generate.js).
+   Server ghép prompt hệ thống, gọi Gemini dạng stream (SSE) và chuyển tiếp về đây.
 */
-export async function generateLessonPlan(payload) {
-  const userMsg = `Hãy soạn giáo án STEAM mầm non với thông tin sau:
-- Độ tuổi: ${payload.doTuoi}
-- Chủ đề: ${payload.chuDe}
-- Đề tài: ${payload.deTai}
-- Quy trình yêu cầu: ${payload.quyTrinh === 'auto' ? 'Tự động chọn quy trình phù hợp nhất' : payload.quyTrinh}
-- Yêu cầu thêm từ giáo viên: ${payload.ghiChu || '(không có)'}
 
-Trả về đúng JSON theo schema đã quy định.`;
-
+async function streamGenerate(mode, payload, onProgress) {
   const response = await fetch('/api/generate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      system: SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: userMsg }]
-    })
+    body: JSON.stringify({ mode, payload })
   });
 
   if (!response.ok) {
@@ -30,70 +16,92 @@ Trả về đúng JSON theo schema đã quy định.`;
       const errBody = await response.json();
       detail = errBody?.error?.message || errBody?.error || '';
     } catch (_) {}
+    if (response.status === 404) {
+      detail = 'Không tìm thấy /api/generate. Hãy chạy bằng "npm run dev" (có file .env chứa GEMINI_API_KEY) hoặc deploy lên Vercel.';
+    }
     throw new Error(`Lỗi kết nối API (${response.status}). ${detail}`);
   }
 
-  const data = await response.json();
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let text = '';
+  let finishReason = '';
 
-  // Định dạng phản hồi của Gemini: data.candidates[0].content.parts[0].text
-  const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!rawText) throw new Error('Không nhận được nội dung từ AI.');
+  const handleEvent = (json) => {
+    if (json.error) throw new Error(json.error.message || 'Lỗi từ Gemini.');
+    const cand = json.candidates?.[0];
+    if (!cand) return;
+    for (const part of cand.content?.parts || []) {
+      if (part.text && !part.thought) text += part.text;
+    }
+    if (cand.finishReason) finishReason = cand.finishReason;
+  };
 
-  let raw = rawText.trim();
-  raw = raw.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```\s*$/, '');
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (value) buffer += decoder.decode(value, { stream: true });
+    let idx;
+    while ((idx = buffer.indexOf('\n')) !== -1) {
+      const line = buffer.slice(0, idx).trim();
+      buffer = buffer.slice(idx + 1);
+      if (!line.startsWith('data:')) continue;
+      const data = line.slice(5).trim();
+      if (!data || data === '[DONE]') continue;
+      let json;
+      try { json = JSON.parse(data); } catch { continue; }
+      handleEvent(json);
+      onProgress?.(text.length);
+    }
+    if (done) break;
+  }
 
- function extractFirstJson(text) {
+  if (!text.trim()) {
+    throw new Error(finishReason === 'SAFETY'
+      ? 'AI từ chối nội dung này. Hãy thử diễn đạt lại đề tài.'
+      : 'Không nhận được nội dung từ AI.');
+  }
+
+  try {
+    return parseJson(text);
+  } catch (e) {
+    if (finishReason === 'MAX_TOKENS') {
+      throw new Error('Giáo án quá dài nên AI bị cắt giữa chừng. Hãy chọn độ dài "Vừa" hoặc "Gọn" rồi thử lại.');
+    }
+    throw e;
+  }
+}
+
+function extractFirstJson(text) {
   const start = text.indexOf('{');
-  if (start === -1) {
-    throw new Error('Không tìm thấy dữ liệu JSON giáo án.');
-  }
-
-  let depth = 0;
-  let inString = false;
-  let escaped = false;
-
+  if (start === -1) throw new Error('Không tìm thấy dữ liệu JSON giáo án.');
+  let depth = 0, inString = false, escaped = false;
   for (let i = start; i < text.length; i++) {
-    const char = text[i];
-
-    if (escaped) {
-      escaped = false;
-      continue;
-    }
-
-    if (char === '\\' && inString) {
-      escaped = true;
-      continue;
-    }
-
-    if (char === '"') {
-      inString = !inString;
-      continue;
-    }
-
-    if (!inString) {
-      if (char === '{') depth++;
-
-      if (char === '}') {
-        depth--;
-
-        if (depth === 0) {
-          return text.slice(start, i + 1);
-        }
-      }
-    }
+    const ch = text[i];
+    if (escaped) { escaped = false; continue; }
+    if (ch === '\\' && inString) { escaped = true; continue; }
+    if (ch === '"') { inString = !inString; continue; }
+    if (inString) continue;
+    if (ch === '{') depth++;
+    if (ch === '}' && --depth === 0) return text.slice(start, i + 1);
   }
-
   throw new Error('JSON giáo án chưa hoàn chỉnh.');
 }
 
-let parsed;
-
-try {
-  parsed = JSON.parse(raw);
-} catch (e) {
-  const jsonText = extractFirstJson(raw);
-  parsed = JSON.parse(jsonText);
+function parseJson(rawText) {
+  const raw = rawText.trim()
+    .replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```\s*$/, '');
+  try {
+    return JSON.parse(raw);
+  } catch (_) {
+    return JSON.parse(extractFirstJson(raw));
+  }
 }
 
-return parsed;
+export function generateLessonPlan(payload, onProgress) {
+  return streamGenerate('lesson', payload, onProgress);
+}
+
+export function generateExtras(plan, onProgress) {
+  return streamGenerate('extras', { plan }, onProgress);
 }

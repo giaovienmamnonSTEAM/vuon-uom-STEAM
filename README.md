@@ -6,31 +6,35 @@ Tạo bởi **Trần Quỳ** – Giáo viên mầm non STEAM.
 
 ---
 
+## ✨ Tính năng
+
+- **4 độ tuổi:** Nhà trẻ 24–36 tháng, Mẫu giáo bé 3–4 tuổi, nhỡ 4–5 tuổi, lớn 5–6 tuổi. Lời thoại, thời lượng và độ khó được điều chỉnh theo từng độ tuổi.
+- **Nguyên tắc cốt lõi (Công phá STEAM cùng Thầy Phúc):** phân tích bản chất hoạt động; dùng 5E cho hoạt động tìm tòi, khám phá; chỉ dùng EDP khi sản phẩm có tính ứng dụng thật; phân biệt STEAM toàn phần / một phần; không gán ép STEAM.
+- **I. Mục đích – Yêu cầu:** Kiến thức theo 5 dòng S-T-E-A-M (ghi "Không áp dụng." nếu thành tố không thực chất) → Kỹ năng 4C's gắn hành vi + kỹ năng khác → Thái độ.
+- **II. Chuẩn bị:** Cô (tâm thế – tâm lý – sức khỏe, chuyên môn, đồ dùng, môi trường, an toàn), Trẻ, Phụ huynh (khi cần).
+- **III. Cách tiến hành:** bảng 2 cột **Hoạt động của Cô | Hoạt động của Trẻ**, lời thoại trực tiếp, câu hỏi mở, nhiều câu trả lời của trẻ.
+- **Tải file Word (.docx):** A4, Times New Roman 13; phần III là một bảng liên tục, mỗi bước một hàng.
+- **Chuyển giáo án truyền thống sang STEAM:** dán giáo án cũ, ứng dụng đánh giá có phù hợp không và tái thiết kế.
+- **Tài nguyên hỗ trợ (tuỳ chọn):** bảng ghi chép / bảng thiết kế, trò chơi, học liệu, slide, prompt AI, phiếu đánh giá.
+- **Lịch sử:** 15 giáo án gần nhất được lưu trong trình duyệt của máy đang dùng.
+
 ## 🧱 Cấu trúc dự án
 
 ```
-steam-lesson-planner/
-├── api/
-│   └── generate.js       # Vercel Serverless Function — proxy gọi Google Gemini API (giữ API key ở server)
-├── public/
-│   └── favicon.svg
-├── src/
-│   ├── main.js            # Logic chính: form, render kết quả, xuất file
-│   ├── api.js              # Hàm gọi tới /api/generate
-│   ├── systemPrompt.js     # Prompt hệ thống mô tả quy trình soạn giáo án STEAM
-│   ├── flower.js           # SVG logo hoa 5 cánh S-T-E-A-M
-│   └── style.css           # Toàn bộ giao diện
-├── index.html               # Trang gốc Vite
-├── package.json
-├── vite.config.js
-├── vercel.json
-├── .env.example
-└── .gitignore
+api/
+  generate.js      # Serverless Function: ghép prompt ở server, gọi Gemini dạng stream (SSE)
+  _prompts.js      # Prompt hệ thống (nguyên tắc + khung giáo án) — không phải route
+src/
+  main.js          # Form, hiển thị giáo án, lịch sử
+  api.js           # Gọi /api/generate và đọc luồng SSE
+  planModel.js     # Độ tuổi, lĩnh vực, nhãn mục, xuất văn bản thuần
+  exportDocx.js    # Xuất file Word (.docx)
+  flower.js, style.css
 ```
 
 ## ⚠️ Quan trọng: về API key
 
-Ứng dụng gọi Google Gemini 2.5 Flash để soạn nội dung giáo án. Vì lý do bảo mật,
+Ứng dụng gọi Google Gemini để soạn nội dung giáo án. Vì lý do bảo mật,
 **API key không bao giờ được đặt ở phía trình duyệt** — nếu làm vậy bất kỳ ai
 mở DevTools cũng lấy được key của bạn.
 
@@ -45,25 +49,11 @@ Lấy API key tại: https://aistudio.google.com/app/apikey
 
 ## 🚀 Chạy thử ở máy local
 
-### Cách 1 — dùng Vercel CLI (khuyên dùng, chạy được cả `/api`)
-
 ```bash
 npm install
-npm install -g vercel   # nếu chưa có
 cp .env.example .env    # rồi điền GEMINI_API_KEY thật vào .env
-vercel dev
+npm run dev             # mở http://localhost:5173 — route /api/generate chạy luôn
 ```
-
-### Cách 2 — dùng `vite dev` (chỉ xem giao diện, KHÔNG gọi được API)
-
-```bash
-npm install
-npm run dev
-```
-
-Với cách 2, nút "Soạn giáo án ngay" sẽ báo lỗi vì `/api/generate` chỉ chạy
-trên môi trường Vercel (hoặc `vercel dev`). Dùng cách này nếu bạn chỉ muốn
-chỉnh sửa giao diện.
 
 ---
 
@@ -102,8 +92,9 @@ Mỗi lần bạn `git push` lên nhánh `main`, Vercel sẽ tự động build 
 ## ✏️ Tuỳ chỉnh
 
 - **Đổi màu / phông chữ:** sửa biến CSS trong `src/style.css` (khối `:root`).
-- **Đổi nội dung / quy tắc soạn giáo án:** sửa `src/systemPrompt.js`.
-- **Đổi model AI:** sửa dòng `const GEMINI_MODEL = 'gemini-2.5-flash'` trong `api/generate.js`.
+- **Đổi nội dung / quy tắc soạn giáo án:** sửa `api/_prompts.js`.
+- **Đổi model AI:** đặt biến môi trường `GEMINI_MODEL` (mặc định `gemini-3.1-flash-lite`).
+- **Thời gian chờ:** `vercel.json` cho phép hàm chạy tối đa 300 giây, đủ cho giáo án chi tiết.
 - **Tên người tạo / thương hiệu:** sửa trực tiếp trong `index.html` (header, footer).
 
 ---

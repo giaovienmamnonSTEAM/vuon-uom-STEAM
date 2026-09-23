@@ -11,5 +11,8 @@
   },
   "devDependencies": {
     "vite": "^5.4.10"
+  },
+  "dependencies": {
+    "docx": "^9.7.2"
   }
 }
