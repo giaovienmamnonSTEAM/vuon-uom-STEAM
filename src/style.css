@@ -529,3 +529,6 @@
     .steam-item, .skill-item, .prep-col{background:none !important;padding:4px 0;}
     .steam-item .letter{color:#000;background:none !important;border:1px solid #000;}
   }
+  .steam-item .body .vi{font-weight:500;color:var(--ink-soft);}
+  .steam-item .body p.one-line, .skill-item p.one-line, .prep-col p.one-line{margin:2px 0 0;font-size:13.5px;line-height:1.6;}
+  .plain-block p.one-line{display:inline;}

@@ -57,19 +57,20 @@ export function suggestProcess(linhVuc) {
   return 'Gợi ý: 5E — hoạt động mang tính tìm tòi, khám phá (STEAM một phần hoặc toàn phần).';
 }
 
+// [ký hiệu, tên tiếng Anh, tên tiếng Việt] — file Word/văn bản ghi "S – Science:" như mẫu của giáo viên.
 export const STEAM_LABELS = [
-  ['S', 'Science (Khoa học)'],
-  ['T', 'Technology (Công nghệ)'],
-  ['E', 'Engineering (Kỹ thuật)'],
-  ['A', 'Art (Nghệ thuật)'],
-  ['M', 'Mathematics (Toán học)']
+  ['S', 'Science', 'Khoa học'],
+  ['T', 'Technology', 'Công nghệ'],
+  ['E', 'Engineering', 'Kỹ thuật'],
+  ['A', 'Art', 'Nghệ thuật'],
+  ['M', 'Mathematics', 'Toán học']
 ];
 
 export const SKILL_LABELS = [
-  ['tu_duy_phan_bien', 'Critical Thinking – Tư duy phản biện'],
-  ['sang_tao', 'Creativity – Sáng tạo'],
-  ['hop_tac', 'Collaboration – Hợp tác'],
-  ['giao_tiep', 'Communication – Giao tiếp']
+  ['tu_duy_phan_bien', 'Critical Thinking (Tư duy phản biện)'],
+  ['sang_tao', 'Creativity (Sáng tạo)'],
+  ['hop_tac', 'Collaboration (Hợp tác)'],
+  ['giao_tiep', 'Communication (Giao tiếp)']
 ];
 
 export const PREP_CO_LABELS = [
@@ -86,6 +87,18 @@ export const PREP_TRE_LABELS = [
   ['trang_phuc', 'Trang phục'],
   ['an_toan', 'An toàn']
 ];
+
+// Mục có thể là một câu (định dạng mới) hoặc mảng (giáo án cũ trong lịch sử) — luôn trả về mảng.
+export function toList(v) {
+  if (Array.isArray(v)) return v.map((x) => String(x ?? '').trim()).filter(Boolean);
+  const t = String(v ?? '').trim();
+  return t ? [t] : [];
+}
+
+export function steamItems(kt, k) {
+  const items = toList(kt?.[k]);
+  return items.length ? items : ['Không áp dụng.'];
+}
 
 export function splitLines(s) {
   return String(s ?? '').split(/\n+/).map((x) => x.trim()).filter(Boolean);
@@ -106,7 +119,6 @@ export function planToText(p) {
   const kn = md.ky_nang || {};
   const cb = p.chuan_bi || {};
   const L = [];
-  const list = (arr, pad = '  ') => (arr || []).forEach((x) => L.push(`${pad}- ${x}`));
 
   L.push('GIÁO ÁN STEAM', '');
   [
@@ -115,21 +127,26 @@ export function planToText(p) {
     ['Quy trình', ti.quy_trinh], ['Áp dụng STEAM', ti.muc_do_steam]
   ].forEach(([k, v]) => v && L.push(`${k}: ${v}`));
 
-  L.push('', 'I. MỤC ĐÍCH – YÊU CẦU', '1. Kiến thức');
-  STEAM_LABELS.forEach(([k, label]) => {
-    L.push(`${k} – ${label}:`);
-    list(kt[k]?.length ? kt[k] : ['Không áp dụng.']);
-  });
-  L.push('2. Kỹ năng', "* Nhóm kỹ năng 4C's:");
-  SKILL_LABELS.forEach(([k, label]) => { if (kn[k]?.length) { L.push(`  ${label}:`); list(kn[k], '    '); } });
-  if (kn.ky_nang_khac?.length) { L.push('* Kỹ năng khác:'); list(kn.ky_nang_khac); }
-  L.push('3. Thái độ'); list(md.thai_do);
+  // Một ý thì viết cùng dòng với nhãn, nhiều ý thì xuống dòng thành các gạch "+".
+  const item = (label, v, pad = '') => {
+    const xs = toList(v);
+    if (!xs.length) return;
+    if (xs.length === 1) L.push(`${pad}- ${label}: ${xs[0]}`);
+    else { L.push(`${pad}- ${label}:`); xs.forEach((x) => L.push(`${pad}  + ${x}`)); }
+  };
+
+  L.push('', 'I. MỤC ĐÍCH - YÊU CẦU', '1. Kiến thức');
+  STEAM_LABELS.forEach(([k, en]) => item(`${k} – ${en}`, steamItems(kt, k)));
+  L.push('2. Kỹ năng', "- Nhóm kỹ năng 4C's:");
+  SKILL_LABELS.forEach(([k, label]) => toList(kn[k]).forEach((x) => L.push(`  + ${label}: ${x}`)));
+  item('Kỹ năng khác', kn.ky_nang_khac);
+  L.push('3. Thái độ'); toList(md.thai_do).forEach((x) => L.push(`- ${x}`));
 
   L.push('', 'II. CHUẨN BỊ', '1. Chuẩn bị của Cô');
-  PREP_CO_LABELS.forEach(([k, label]) => { if (cb.co?.[k]?.length) { L.push(`${label}:`); list(cb.co[k]); } });
+  PREP_CO_LABELS.forEach(([k, label]) => item(label, cb.co?.[k]));
   L.push('2. Chuẩn bị của Trẻ');
-  PREP_TRE_LABELS.forEach(([k, label]) => { if (cb.tre?.[k]?.length) { L.push(`${label}:`); list(cb.tre[k]); } });
-  if (cb.phu_huynh?.length) { L.push('3. Phối hợp chuẩn bị với Phụ huynh học sinh'); list(cb.phu_huynh); }
+  PREP_TRE_LABELS.forEach(([k, label]) => item(label, cb.tre?.[k]));
+  if (toList(cb.phu_huynh).length) { L.push('3. Phối hợp chuẩn bị với Phụ huynh học sinh'); toList(cb.phu_huynh).forEach((x) => L.push(`- ${x}`)); }
 
   L.push('', 'III. CÁCH TIẾN HÀNH');
   (p.cach_tien_hanh || []).forEach((s) => {

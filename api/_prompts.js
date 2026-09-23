@@ -35,16 +35,30 @@ LUÔN ghi đủ 5 dòng S-T-E-A-M. Thành tố nào không có vai trò thực c
 
 === B. CẤU TRÚC GIÁO ÁN (quyết định TRÌNH BÀY RA SAO) ===
 
-I. MỤC ĐÍCH – YÊU CẦU gồm 3 mục:
- 1. Kiến thức — theo 5 thành tố S-T-E-A-M như A4. Mục tiêu cụ thể, quan sát được, đánh giá được, bắt đầu bằng "Trẻ ...".
- 2. Kỹ năng — Nhóm 4C's, mỗi kỹ năng gắn HÀNH VI THỰC TẾ của trẻ trong chính bài này (không viết "trẻ phát triển tư duy phản biện" mà viết "trẻ biết đưa ra dự đoán, nêu lý do lựa chọn và so sánh kết quả sau khi thử nghiệm"):
-    • Critical Thinking – Tư duy phản biện • Creativity – Sáng tạo • Collaboration – Hợp tác • Communication – Giao tiếp
-    Sau đó là "Kỹ năng khác" liên quan bài học (quan sát, ghi nhớ, phân loại, đếm, đo, vận động tinh/thô, sử dụng công cụ, ngôn ngữ, tự phục vụ, an toàn...).
- 3. Thái độ — chỉ chọn thái độ thực sự phù hợp (hứng thú, tự tin, chủ động, kiên trì, hợp tác, chia sẻ, tôn trọng ý tưởng của bạn, giữ gìn đồ dùng, tuân thủ quy tắc an toàn...).
+I. MỤC ĐÍCH – YÊU CẦU gồm 3 mục (viết ĐÚNG hình thức và văn phong như MẪU CHUẨN ở mục G):
+ 1. Kiến thức — đúng 5 dòng S – Science, T – Technology, E – Engineering, A – Art, M – Mathematics. MỖI DÒNG LÀ MỘT CÂU hoàn chỉnh bắt đầu bằng "Trẻ ...", cụ thể theo đề tài, có thể kèm chi tiết minh hoạ trong ngoặc đơn. Gợi ý cách viết từng dòng:
+    • S: "Trẻ nhận biết / biết được ..." — kiến thức, đặc tính vật liệu, hiện tượng trẻ có được.
+    • T: "Trẻ biết sử dụng các công cụ, dụng cụ đơn giản (...) để ..." — chỉ đồ TRẺ dùng.
+    • E: "Trẻ hiểu được quy trình tạo ra ... (bước 1, bước 2, ...)" hoặc "Trẻ biết cách ..." — quá trình thực hành.
+    • A: "Trẻ phối hợp màu sắc, hình dạng ... tạo thành sản phẩm hài hòa, đẹp mắt" và/hoặc lồng ghép nghệ thuật, giáo dục.
+    • M: "Trẻ ứng dụng kỹ năng đo / đếm / so sánh / nhận biết hình dạng ...".
+    Thành tố nào không có vai trò thực chất ghi đúng "Không áp dụng.".
+ 2. Kỹ năng:
+    • Nhóm kỹ năng 4C's — mỗi kỹ năng MỘT CÂU gắn hành vi thực tế trong chính bài này, có ví dụ cụ thể trong ngoặc: Critical Thinking (Tư duy phản biện), Creativity (Sáng tạo), Collaboration (Hợp tác), Communication (Giao tiếp).
+    • Kỹ năng khác: MỘT dòng, liệt kê ngăn cách bằng dấu chấm phẩy, có ví dụ trong ngoặc (VD: "Vận động tinh (bóc băng dính, đính hạt, cầm kéo); kỹ năng đo đạc thực tế; sử dụng công cụ an toàn.").
+ 3. Thái độ — 2-3 ý, mỗi ý một câu bắt đầu bằng "Trẻ ...".
 
-II. CHUẨN BỊ:
- 1. Chuẩn bị của Cô: Tâm thế – tâm lý – sức khỏe (sẵn sàng, thoải mái, tích cực; ổn định, bình tĩnh, chủ động; sức khỏe tốt); Chuyên môn (nắm chắc nội dung, mục tiêu, quy trình 5E/EDP, dự kiến tình huống có thể xảy ra); Đồ dùng – học liệu – nguyên vật liệu (liệt kê CỤ THỂ, có số lượng); Môi trường (không gian, bố trí nhóm, khu vực hoạt động/thử nghiệm); An toàn (kiểm tra vật liệu, dụng cụ, cạnh sắc, vật nhỏ, trơn trượt, dị ứng, nguy cơ cho vào miệng, va chạm — nêu biện pháp kiểm soát).
- 2. Chuẩn bị của Trẻ: Tâm thế – tâm lý – sức khỏe; Đồ dùng – nguyên vật liệu (cá nhân/nhóm); Trang phục; An toàn; Kiến thức/trải nghiệm đã có (nếu cần).
+II. CHUẨN BỊ (viết đúng như MẪU CHUẨN ở mục G):
+ 1. Chuẩn bị của Cô:
+    • Tâm thế – tâm lý – sức khỏe: MỘT câu gộp tâm thế, tâm lý, sức khỏe VÀ chuyên môn (nắm vững quy trình 5E/EDP, dự kiến tình huống trẻ có thể gặp — nêu tình huống cụ thể trong ngoặc).
+    • Đồ dùng – học liệu – nguyên vật liệu: danh sách CỤ THỂ (tên, kích thước, màu, số lượng, đã sơ chế sẵn thế nào) — nhóm theo loại: bảng/phiếu, nguyên vật liệu chính, chi tiết trang trí/phụ liệu, dụng cụ, đồ dùng hỗ trợ.
+    • Môi trường: MỘT đoạn — cách bố trí lớp, số nhóm, khu vực thử nghiệm/trưng bày có tên gọi vui (VD "Sàn catwalk").
+    • An toàn: danh sách biện pháp cụ thể gắn với vật liệu, dụng cụ của bài.
+ 2. Chuẩn bị của Trẻ:
+    • Tâm thế – tâm lý – sức khỏe: MỘT câu.
+    • Đồ dùng – nguyên vật liệu: CHỈ ghi khi trẻ phải tự mang/chuẩn bị riêng; không có thì để mảng rỗng.
+    • Trang phục: MỘT câu.
+    • An toàn: MỘT câu về quy tắc an toàn trẻ cần thuộc.
  3. Phối hợp với phụ huynh: CHỈ ghi khi thực sự cần (VD sưu tầm vật liệu tái chế); không cần thì để mảng rỗng.
 
 III. CÁCH TIẾN HÀNH — bảng 2 cột "Hoạt động của Cô | Hoạt động của Trẻ", chia rõ từng giai đoạn theo khung:
@@ -85,6 +99,46 @@ Kiểm tra vật nhỏ, kéo, que nhọn, dây, nước nóng, nhiệt, điện,
 Đủ I – II – III; S-T-E-A-M thực chất (đặc biệt T chỉ gồm đồ trẻ dùng); 4C's gắn hành vi; đúng quy trình và đủ giai đoạn; EDP có vấn đề – tiêu chí – thiết kế – thử nghiệm – cải tiến, không làm theo mẫu; trẻ được nghĩ, chọn, thử, sai và sửa, trình bày; lời thoại hai chiều cụ thể; phù hợp độ tuổi; an toàn.
 Trả lời được: "Trẻ đang giải quyết vấn đề gì, khám phá điều gì, suy nghĩ thế nào và học được gì qua trải nghiệm?" Khi mâu thuẫn giữa "đẹp hình thức" và "đúng bản chất STEAM", ưu tiên bản chất.
 
+=== G. MẪU CHUẨN (hình thức + văn phong phần I, II) ===
+Dưới đây là mẫu giáo viên đã duyệt cho đề tài "Làm vương miện" (EDP, mẫu giáo). Bắt chước ĐÚNG cách viết: độ dài câu, mức cụ thể, chi tiết trong ngoặc, cách gộp ý. KHÔNG chép nội dung sang đề tài khác.
+
+I. MỤC ĐÍCH - YÊU CẦU
+1. Kiến thức
+- S – Science: Trẻ nhận biết đặc tính của một số vật liệu (dải xốp/bìa có độ đàn hồi/uốn cong được, giấy can gai, kim tuyến, hạt cườm lấp lánh phản chiếu ánh sáng).
+- T – Technology: Trẻ biết sử dụng các công cụ, dụng cụ đơn giản (băng dính 2 mặt, keo dán, xốp dính, kéo thủ công đầu tròn) để liên kết vật liệu.
+- E – Engineering: Trẻ hiểu được quy trình tạo ra chiếc vương miện (đo kích thước vòng đầu, uốn cong dải xốp/giấy bìa tạo khung, gắn các chi tiết trang trí, cố định hai đầu).
+- A – Art: Trẻ phối hợp màu sắc, hình dạng (ngôi sao, hình tròn, hình tam giác) và trang trí họa tiết lấp lánh tạo thành sản phẩm hài hòa, đẹp mắt.
+- M – Mathematics: Trẻ ứng dụng kỹ năng đo đạc trực tiếp (đo vòng đầu), nhận biết hình khối/hình dạng và đếm số lượng chi tiết trang trí.
+2. Kỹ năng
+- Nhóm kỹ năng 4C's:
+  + Critical Thinking (Tư duy phản biện): Trẻ biết kiểm tra sản phẩm (vương miện có vừa đầu không, có bị rộng hay chật không, trang trí đã đính chắc chưa) và nhận ra điểm cần sửa.
+  + Creativity (Sáng tạo): Trẻ tự do lựa chọn kiểu dáng đỉnh vương miện, phối màu và sắp xếp các nguyên vật liệu lấp lánh theo ý thích.
+  + Collaboration (Hợp tác): Trẻ biết hỗ trợ bạn bên cạnh (giúp bạn giữ dải giấy khi đo vòng đầu hoặc giúp bạn dán cố định hai đầu vương miện).
+  + Communication (Giao tiếp): Trẻ nói được ý tưởng thiết kế của mình và tự tin giới thiệu sản phẩm trước cô và các bạn.
+- Kỹ năng khác: Vận động tinh (bóc băng dính, đính hạt, cầm kéo); kỹ năng đo đạc thực tế; sử dụng công cụ an toàn.
+3. Thái độ
+- Trẻ tích cực, hứng thú tham gia thử thách thiết kế.
+- Trẻ kiên trì hoàn thành sản phẩm và biết giữ gìn đồ dùng, dọn dẹp nguyên vật liệu sau khi học.
+
+II. CHUẨN BỊ
+1. Chuẩn bị của Cô
+- Tâm thế – tâm lý – sức khỏe: Thoải mái, năng lượng, vui vẻ; sức khỏe tốt; nắm vững quy trình EDP và các tình huống trẻ có thể gặp phải (vương miện bị rộng/hẹp, đính đồ bị rơi).
+- Đồ dùng – học liệu – nguyên vật liệu:
+  + Bảng phác thảo ý tưởng mẫu (hoặc giấy vẽ + màu tô cho trẻ).
+  + Các dải xốp nẹp/dải giấy bìa màu rực rỡ có độ uốn cong tốt (kích thước dài 55-60cm).
+  + Chi tiết trang trí: Kim tuyến, hạt cườm, hình ngôi sao/trái tim/hình tròn cắt sẵn bằng dạ/xốp kim tuyến, dây kim tuyến nhiều màu.
+  + Dụng cụ: Băng dính 2 mặt (đã xé sẵn mép cho trẻ dễ bóc), dải dính gai dán sẵn 2 đầu, keo dán khô, kéo mầm non đầu tròn.
+  + Gương soi nhỏ cho các nhóm.
+- Môi trường: Không gian lớp học rộng rãi, chia làm 3-4 nhóm bàn. Có khu vực "Sàn catwalk" hoặc "Sân khấu búp búp" để thử nghiệm và trình diễn sản phẩm.
+- An toàn:
+  + Kiểm tra kéo không có đầu nhọn sắc.
+  + Hạt cườm, hạt kim tuyến kích thước vừa phải (không quá nhỏ) để tránh trẻ nhét vào mũi/tai/miệng.
+  + Dải bìa/xốp cắt mép mịn, không có cạnh sắc xước tay trẻ.
+2. Chuẩn bị của Trẻ
+- Tâm thế – tâm lý – sức khỏe: Tâm lý vui vẻ, sẵn sàng tham gia trải nghiệm; sức khỏe ổn định.
+- Trang phục: Gọn gàng, thoải mái khi di chuyển và vận động.
+- An toàn: Thuộc quy tắc không ngậm đồ chơi/hạt cườm, sử dụng kéo theo hướng dẫn.
+
 === ĐỊNH DẠNG ĐẦU RA ===
 CHỈ trả về MỘT object JSON hợp lệ (không markdown, không backtick, không chữ nào ngoài JSON). Chuỗi nhiều đoạn dùng "\\n" để xuống dòng. Schema:
 
@@ -108,29 +162,34 @@ CHỈ trả về MỘT object JSON hợp lệ (không markdown, không backtick,
     "gioi_han": ["string — nếu có"]
   },
   "muc_dich_yeu_cau": {
-    "kien_thuc": { "S": ["string"], "T": ["string"], "E": ["string"], "A": ["string"], "M": ["string"] },
-    "ky_nang": {
-      "tu_duy_phan_bien": ["string"],
-      "sang_tao": ["string"],
-      "hop_tac": ["string"],
-      "giao_tiep": ["string"],
-      "ky_nang_khac": ["string"]
+    "kien_thuc": {
+      "S": "string — MỘT câu bắt đầu bằng \"Trẻ ...\"",
+      "T": "string — MỘT câu",
+      "E": "string — MỘT câu",
+      "A": "string — MỘT câu",
+      "M": "string — MỘT câu hoặc \"Không áp dụng.\""
     },
-    "thai_do": ["string"]
+    "ky_nang": {
+      "tu_duy_phan_bien": "string — MỘT câu",
+      "sang_tao": "string — MỘT câu",
+      "hop_tac": "string — MỘT câu",
+      "giao_tiep": "string — MỘT câu",
+      "ky_nang_khac": "string — MỘT dòng, các kỹ năng ngăn cách bằng dấu chấm phẩy"
+    },
+    "thai_do": ["string — mỗi ý một câu \"Trẻ ...\""]
   },
   "chuan_bi": {
     "co": {
-      "tam_the_tam_ly_suc_khoe": ["string"],
-      "chuyen_mon": ["string"],
-      "do_dung_hoc_lieu": ["string"],
-      "moi_truong": ["string"],
+      "tam_the_tam_ly_suc_khoe": "string — MỘT câu gộp cả chuyên môn",
+      "do_dung_hoc_lieu": ["string — mỗi nhóm đồ dùng một dòng, có thể mở đầu bằng \"Dụng cụ: ...\", \"Chi tiết trang trí: ...\""],
+      "moi_truong": "string — MỘT đoạn",
       "an_toan": ["string"]
     },
     "tre": {
-      "tam_the_tam_ly_suc_khoe": ["string"],
-      "do_dung_nguyen_lieu": ["string"],
-      "trang_phuc": ["string"],
-      "an_toan": ["string"]
+      "tam_the_tam_ly_suc_khoe": "string — MỘT câu",
+      "do_dung_nguyen_lieu": ["string — mảng rỗng nếu trẻ không cần tự chuẩn bị"],
+      "trang_phuc": "string — MỘT câu",
+      "an_toan": "string — MỘT câu"
     },
     "phu_huynh": ["string — mảng rỗng nếu không cần"]
   },

@@ -3,7 +3,7 @@ import { flowerSVG } from './flower.js';
 import { generateLessonPlan, generateExtras } from './api.js';
 import {
   AGES, linhVucFor, suggestProcess, STEAM_LABELS, SKILL_LABELS,
-  PREP_CO_LABELS, PREP_TRE_LABELS, splitLines, planToText, fileSlug
+  PREP_CO_LABELS, PREP_TRE_LABELS, splitLines, planToText, fileSlug, toList, steamItems
 } from './planModel.js';
 
 document.getElementById('logoMark').innerHTML = flowerSVG(56);
@@ -12,9 +12,15 @@ document.getElementById('logoMark').innerHTML = flowerSVG(56);
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
-function listHTML(arr) {
-  if (!arr || !arr.length) return '<p class="muted">(Không có)</p>';
+function listHTML(v) {
+  const arr = toList(v);
+  if (!arr.length) return '<p class="muted">(Không có)</p>';
   return '<ul>' + arr.map((x) => `<li>${esc(x)}</li>`).join('') + '</ul>';
+}
+// Một ý: hiện dạng đoạn văn; nhiều ý: danh sách.
+function textOrList(v) {
+  const arr = toList(v);
+  return arr.length === 1 ? `<p class="one-line">${esc(arr[0])}</p>` : listHTML(arr);
 }
 function linesHTML(s) {
   return splitLines(s).map((l) => `<p>${esc(l)}</p>`).join('');
@@ -200,29 +206,29 @@ function lessonHTML(p) {
   html += `<div class="section-card"><h3><span class="num" style="background:var(--s-blue)">I</span>Mục đích – Yêu cầu</h3>
     <h4 class="sub-h">1. Kiến thức</h4>
     <div class="steam-grid">
-    ${STEAM_LABELS.map(([k, label]) => {
-      const items = kt[k]?.length ? kt[k] : ['Không áp dụng.'];
+    ${STEAM_LABELS.map(([k, en, vi]) => {
+      const items = steamItems(kt, k);
       const na = items.length === 1 && /^không áp dụng/i.test(items[0]);
-      return `<div class="steam-item ${k} ${na ? 'na' : ''}"><div class="letter">${k}</div><div class="body"><b>${k} – ${label}</b><ul>${items.map((i) => `<li>${esc(i)}</li>`).join('')}</ul></div></div>`;
+      return `<div class="steam-item ${k} ${na ? 'na' : ''}"><div class="letter">${k}</div><div class="body"><b>${k} – ${en} <span class="vi">(${vi})</span></b>${textOrList(items)}</div></div>`;
     }).join('')}
     </div>
     <h4 class="sub-h">2. Kỹ năng</h4>
     <div class="skill-grid">
-      ${SKILL_LABELS.map(([k, label]) => `<div class="skill-item"><div class="skill-name">${label}</div>${listHTML(kn[k])}</div>`).join('')}
+      ${SKILL_LABELS.map(([k, label]) => `<div class="skill-item"><div class="skill-name">${label}</div>${textOrList(kn[k])}</div>`).join('')}
     </div>
-    ${kn.ky_nang_khac?.length ? `<div class="plain-block"><b>Kỹ năng khác:</b>${listHTML(kn.ky_nang_khac)}</div>` : ''}
+    ${toList(kn.ky_nang_khac).length ? `<div class="plain-block"><b>Kỹ năng khác:</b> ${textOrList(kn.ky_nang_khac)}</div>` : ''}
     <h4 class="sub-h">3. Thái độ</h4>
     <div class="plain-block">${listHTML(md.thai_do)}</div>
   </div>`;
 
   // II. CHUẨN BỊ
   const prepCol = (title, obj, labels) => `<div class="prep-col"><div class="prep-title">${title}</div>
-    ${labels.map(([k, label]) => obj?.[k]?.length ? `<div class="prep-sub">${label}</div>${listHTML(obj[k])}` : '').join('')}</div>`;
+    ${labels.map(([k, label]) => toList(obj?.[k]).length ? `<div class="prep-sub">${label}</div>${textOrList(obj[k])}` : '').join('')}</div>`;
   html += `<div class="section-card"><h3><span class="num" style="background:var(--t-purple)">II</span>Chuẩn bị</h3>
-    <div class="prep-grid ${cb.phu_huynh?.length ? '' : 'two'}">
+    <div class="prep-grid ${toList(cb.phu_huynh).length ? '' : 'two'}">
       ${prepCol('👩‍🏫 1. Chuẩn bị của Cô', cb.co, PREP_CO_LABELS)}
       ${prepCol('🧒 2. Chuẩn bị của Trẻ', cb.tre, PREP_TRE_LABELS)}
-      ${cb.phu_huynh?.length ? `<div class="prep-col"><div class="prep-title">👪 3. Phối hợp với Phụ huynh</div>${listHTML(cb.phu_huynh)}</div>` : ''}
+      ${toList(cb.phu_huynh).length ? `<div class="prep-col"><div class="prep-title">👪 3. Phối hợp với Phụ huynh</div>${listHTML(cb.phu_huynh)}</div>` : ''}
     </div></div>`;
 
   // III. CÁCH TIẾN HÀNH — bảng 2 cột

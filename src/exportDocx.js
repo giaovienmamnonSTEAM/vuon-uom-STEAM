@@ -8,7 +8,7 @@ import {
   AlignmentType, BorderStyle, Document, Packer, Paragraph, Table, TableCell,
   TableRow, TextRun, UnderlineType, VerticalAlign, WidthType
 } from 'docx';
-import { STEAM_LABELS, SKILL_LABELS, PREP_CO_LABELS, PREP_TRE_LABELS, splitLines, fileSlug } from './planModel.js';
+import { STEAM_LABELS, SKILL_LABELS, PREP_CO_LABELS, PREP_TRE_LABELS, splitLines, fileSlug, toList, steamItems } from './planModel.js';
 
 const FONT = 'Times New Roman';
 const SIZE = 26; // half-points = 13pt
@@ -35,20 +35,21 @@ function subHeading(text) {
   return para([run(text, { bold: true, italics: true })], { spacing: { before: 100, after: 40 } });
 }
 
-function labeled(label, items, indent = 0) {
-  const list = (items || []).filter(Boolean);
+// "- Nhãn: nội dung" nếu một ý; nhiều ý thì "- Nhãn:" rồi các dòng "+ ..." thụt vào.
+function labeled(label, value, indent = 284, mark = '-') {
+  const list = toList(value);
   if (!list.length) return [];
   if (list.length === 1) {
-    return [para([run(label + ': ', { bold: true }), run(list[0])], { indent: { left: indent } })];
+    return [para([run(`${mark} ${label}: `, { bold: true }), run(list[0])], { indent: { left: indent } })];
   }
   return [
-    para([run(label + ':', { bold: true })], { indent: { left: indent } }),
-    ...list.map((t) => para('- ' + t, { indent: { left: indent + 284 } }))
+    para([run(`${mark} ${label}:`, { bold: true })], { indent: { left: indent } }),
+    ...list.map((t) => para('+ ' + t, { indent: { left: indent + 360 } }))
   ];
 }
 
-function bullets(items, indent = 284) {
-  return (items || []).filter(Boolean).map((t) => para('- ' + t, { indent: { left: indent } }));
+function bullets(value, indent = 284) {
+  return toList(value).map((t) => para('- ' + t, { indent: { left: indent } }));
 }
 
 function cellParas(lines, first = []) {
@@ -123,28 +124,23 @@ export async function exportDocx(plan) {
   });
 
   // I. MỤC ĐÍCH – YÊU CẦU
-  children.push(heading('I. MỤC ĐÍCH – YÊU CẦU'));
+  children.push(heading('I. MỤC ĐÍCH - YÊU CẦU'));
   children.push(subHeading('1. Kiến thức'));
-  STEAM_LABELS.forEach(([k, label]) => {
-    children.push(...labeled(`${k} – ${label}`, kt[k]?.length ? kt[k] : ['Không áp dụng.'], 284));
-  });
+  STEAM_LABELS.forEach(([k, en]) => children.push(...labeled(`${k} – ${en}`, steamItems(kt, k))));
   children.push(subHeading('2. Kỹ năng'));
-  children.push(para([run("* Nhóm kỹ năng 4C's:", { bold: true })], { indent: { left: 284 } }));
-  SKILL_LABELS.forEach(([k, label]) => children.push(...labeled(label, kn[k], 568)));
-  if (kn.ky_nang_khac?.length) {
-    children.push(para([run('* Kỹ năng khác:', { bold: true })], { indent: { left: 284 } }));
-    children.push(...bullets(kn.ky_nang_khac, 568));
-  }
+  children.push(para([run("- Nhóm kỹ năng 4C's:", { bold: true })], { indent: { left: 284 } }));
+  SKILL_LABELS.forEach(([k, label]) => children.push(...labeled(label, kn[k], 644, '+')));
+  children.push(...labeled('Kỹ năng khác', kn.ky_nang_khac));
   children.push(subHeading('3. Thái độ'));
   children.push(...bullets(md.thai_do));
 
   // II. CHUẨN BỊ
   children.push(heading('II. CHUẨN BỊ'));
   children.push(subHeading('1. Chuẩn bị của Cô'));
-  PREP_CO_LABELS.forEach(([k, label]) => children.push(...labeled(label, co[k], 284)));
+  PREP_CO_LABELS.forEach(([k, label]) => children.push(...labeled(label, co[k])));
   children.push(subHeading('2. Chuẩn bị của Trẻ'));
-  PREP_TRE_LABELS.forEach(([k, label]) => children.push(...labeled(label, tre[k], 284)));
-  if (cb.phu_huynh?.length) {
+  PREP_TRE_LABELS.forEach(([k, label]) => children.push(...labeled(label, tre[k])));
+  if (toList(cb.phu_huynh).length) {
     children.push(subHeading('3. Phối hợp chuẩn bị với Phụ huynh học sinh'));
     children.push(...bullets(cb.phu_huynh));
   }
