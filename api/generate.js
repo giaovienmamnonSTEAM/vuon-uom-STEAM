@@ -1,18 +1,18 @@
-// Vercel Serverless Function — proxy gọi Google Gemini API (dạng stream).
-// - Giữ GEMINI_API_KEY ở server (biến môi trường), KHÔNG lộ ra trình duyệt.
+// Vercel Serverless Function — gọi Claude API (Anthropic) dạng stream.
+// - Giữ ANTHROPIC_API_KEY ở server (biến môi trường), KHÔNG lộ ra trình duyệt.
 // - Prompt hệ thống được ghép ở server (api/_prompts.js); trình duyệt chỉ gửi
-//   thông tin giáo án, nên endpoint này không dùng được làm proxy Gemini tuỳ ý.
-// - Trả về luồng SSE của Gemini để giáo án dài không bị timeout và giao diện
-//   hiển thị được tiến độ.
+//   thông tin giáo án, nên endpoint này không dùng được để gọi Claude tuỳ ý.
+// - Chuyển tiếp từng đoạn chữ về trình duyệt (SSE) để giáo án dài không bị
+//   timeout và giao diện hiển thị được tiến độ.
 //
 // Biến môi trường:
-//   GEMINI_API_KEY  (bắt buộc)
-//   GEMINI_MODEL    (tuỳ chọn, mặc định bên dưới)
-//   GEMINI_API_BASE (tuỳ chọn, chỉ dùng khi thử nghiệm với server giả lập)
+//   ANTHROPIC_API_KEY (bắt buộc)
+//   CLAUDE_MODEL      (tuỳ chọn, mặc định bên dưới)
 
+import Anthropic from '@anthropic-ai/sdk';
 import { LESSON_SYSTEM_PROMPT, EXTRAS_SYSTEM_PROMPT, LENGTH_GUIDE } from './_prompts.js';
 
-const DEFAULT_MODEL = 'gemini-3.1-flash-lite';
+const DEFAULT_MODEL = 'claude-opus-5';
 const MAX_FIELD = 6000;
 
 function clip(v, max = 300) {
@@ -62,16 +62,19 @@ function sendJson(res, status, obj) {
   res.end(JSON.stringify(obj));
 }
 
+function sse(res, obj) {
+  res.write(`data: ${JSON.stringify(obj)}\n\n`);
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return sendJson(res, 405, { error: 'Method not allowed' });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
+  if (!process.env.ANTHROPIC_API_KEY) {
     return sendJson(res, 500, {
-      error: 'Thiếu GEMINI_API_KEY trên server. Vào Vercel → Settings → Environment Variables để thêm.'
+      error: 'Thiếu ANTHROPIC_API_KEY trên server. Vào Vercel → Settings → Environment Variables để thêm.'
     });
   }
 
@@ -90,54 +93,45 @@ export default async function handler(req, res) {
   const system = mode === 'lesson' ? LESSON_SYSTEM_PROMPT : EXTRAS_SYSTEM_PROMPT;
   const userMsg = mode === 'lesson' ? buildLessonMessage(payload) : buildExtrasMessage(payload);
 
-  const model = process.env.GEMINI_MODEL || DEFAULT_MODEL;
-  const base = process.env.GEMINI_API_BASE || 'https://generativelanguage.googleapis.com';
-  const url = `${base}/v1beta/models/${model}:streamGenerateContent?alt=sse`;
-
-  let upstream;
-  try {
-    upstream = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: system }] },
-        contents: [{ role: 'user', parts: [{ text: userMsg }] }],
-        generationConfig: {
-          maxOutputTokens: mode === 'lesson' ? 32768 : 8192,
-          temperature: 0.9,
-          responseMimeType: 'application/json'
-        }
-      })
-    });
-  } catch (err) {
-    return sendJson(res, 502, { error: 'Không kết nối được Gemini API: ' + (err.message || err) });
-  }
-
-  if (!upstream.ok) {
-    let detail = '';
-    try {
-      const data = await upstream.json();
-      detail = data?.error?.message || JSON.stringify(data);
-    } catch {
-      detail = await upstream.text().catch(() => '');
-    }
-    return sendJson(res, upstream.status, { error: detail || `Gemini trả về lỗi ${upstream.status}` });
-  }
+  const client = new Anthropic();
+  // fallbacks: "default" — nếu bộ lọc an toàn của model từ chối, API tự chạy lại
+  // yêu cầu trên model dự phòng phù hợp ngay trong cùng lượt gọi.
+  const stream = client.beta.messages.stream({
+    model: process.env.CLAUDE_MODEL || DEFAULT_MODEL,
+    max_tokens: mode === 'lesson' ? 64000 : 16000,
+    thinking: { type: 'adaptive' },
+    // Soạn giáo án là viết nội dung dài theo khung có sẵn: "medium" đủ chất lượng
+    // mà nhanh hơn, giữ thời gian chạy trong giới hạn của Vercel.
+    output_config: { effort: mode === 'lesson' ? 'medium' : 'low' },
+    betas: ['server-side-fallback-2026-07-01'],
+    fallbacks: 'default',
+    cache_control: { type: 'ephemeral' },
+    system,
+    messages: [{ role: 'user', content: userMsg }]
+  });
 
   res.statusCode = 200;
   res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
   res.setHeader('Cache-Control', 'no-cache, no-transform');
   res.setHeader('X-Accel-Buffering', 'no');
+  res.on('close', () => stream.abort());
 
-  const reader = upstream.body.getReader();
   try {
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      res.write(Buffer.from(value));
+    for await (const event of stream) {
+      if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+        sse(res, { text: event.delta.text });
+      } else if (event.type === 'content_block_start' && event.content_block.type === 'thinking') {
+        sse(res, { thinking: true });
+      }
     }
+    const message = await stream.finalMessage();
+    sse(res, { done: true, stop_reason: message.stop_reason });
   } catch (err) {
-    res.write(`data: ${JSON.stringify({ error: { message: 'Luồng dữ liệu bị gián đoạn: ' + (err.message || err) } })}\n\n`);
+    let msg = err?.message || String(err);
+    if (err instanceof Anthropic.AuthenticationError) msg = 'ANTHROPIC_API_KEY không hợp lệ.';
+    else if (err instanceof Anthropic.RateLimitError) msg = 'Claude đang quá tải hoặc hết hạn mức. Vui lòng thử lại sau ít phút.';
+    else if (err instanceof Anthropic.APIError && err.status) msg = `Claude API lỗi ${err.status}: ${msg}`;
+    sse(res, { error: msg });
   }
   res.end();
 }

@@ -1,11 +1,11 @@
 // Prompt hệ thống cho Vườn Ươm STEAM.
 // File nằm trong thư mục api/ nhưng bắt đầu bằng "_" nên Vercel KHÔNG coi là một route.
-// Prompt được giữ ở server để endpoint /api/generate không bị dùng làm proxy Gemini tuỳ ý.
+// Prompt được giữ ở server để endpoint /api/generate không bị dùng làm gọi Claude tuỳ ý.
 //
 // Nguồn quy tắc (2 lớp, không trộn lẫn):
 //  1. Tài liệu "Công phá STEAM cùng Thầy Phúc" = NGUYÊN TẮC CỐT LÕI: khi nào 5E, khi nào EDP,
 //     bản chất từng thành tố S-T-E-A-M, không gán ép STEAM.
-//  2. Cấu trúc chuẩn của giáo viên (trợ lý Gemini đã luyện) = HÌNH THỨC ĐẦU RA:
+//  2. Cấu trúc chuẩn của giáo viên (mẫu giáo viên đã duyệt) = HÌNH THỨC ĐẦU RA:
 //     Mục đích – Yêu cầu 3 mục (Kiến thức theo S-T-E-A-M → Kỹ năng 4C's + kỹ năng khác → Thái độ),
 //     Chuẩn bị chi tiết, Cách tiến hành bảng 2 cột Cô | Trẻ có lời thoại đầy đủ.
 

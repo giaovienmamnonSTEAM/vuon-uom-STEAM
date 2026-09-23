@@ -22,7 +22,7 @@ Tạo bởi **Trần Quỳ** – Giáo viên mầm non STEAM.
 
 ```
 api/
-  generate.js      # Serverless Function: ghép prompt ở server, gọi Gemini dạng stream (SSE)
+  generate.js      # Serverless Function: ghép prompt ở server, gọi Claude API (SDK @anthropic-ai/sdk) dạng stream
   _prompts.js      # Prompt hệ thống (nguyên tắc + khung giáo án) — không phải route
 src/
   main.js          # Form, hiển thị giáo án, lịch sử
@@ -34,16 +34,16 @@ src/
 
 ## ⚠️ Quan trọng: về API key
 
-Ứng dụng gọi Google Gemini để soạn nội dung giáo án. Vì lý do bảo mật,
+Ứng dụng gọi **Claude API** của Anthropic (model mặc định `claude-opus-5`) để soạn nội dung giáo án. Vì lý do bảo mật,
 **API key không bao giờ được đặt ở phía trình duyệt** — nếu làm vậy bất kỳ ai
 mở DevTools cũng lấy được key của bạn.
 
 Vì vậy dự án này gọi qua route server-side `api/generate.js` (Vercel Serverless
-Function), route này đọc key từ biến môi trường `GEMINI_API_KEY` trên server.
-Bạn cần tự cấp một API key Google Gemini và khai báo biến môi trường này khi deploy
+Function), route này đọc key từ biến môi trường `ANTHROPIC_API_KEY` trên server.
+Bạn cần tự cấp một API key Anthropic và khai báo biến môi trường này khi deploy
 (xem bước 3 bên dưới) — ứng dụng sẽ không tạo được giáo án nếu thiếu key.
 
-Lấy API key tại: https://aistudio.google.com/app/apikey
+Lấy API key tại: https://console.anthropic.com/settings/keys (cần nạp tín dụng trong mục Billing; mỗi giáo án chi tiết tốn khoảng vài nghìn đồng tiền API).
 
 ---
 
@@ -51,7 +51,7 @@ Lấy API key tại: https://aistudio.google.com/app/apikey
 
 ```bash
 npm install
-cp .env.example .env    # rồi điền GEMINI_API_KEY thật vào .env
+cp .env.example .env    # rồi điền ANTHROPIC_API_KEY thật vào .env
 npm run dev             # mở http://localhost:5173 — route /api/generate chạy luôn
 ```
 
@@ -80,7 +80,7 @@ git push -u origin main
 
    | Name | Value |
    |---|---|
-   | `GEMINI_API_KEY` | API key Google Gemini của bạn |
+   | `ANTHROPIC_API_KEY` | API key Anthropic của bạn |
 
 4. Bấm **Deploy**. Sau khi build xong, Vercel sẽ cấp cho bạn một domain dạng
    `https://ten-du-an.vercel.app` — mở lên là dùng được ngay.
@@ -93,7 +93,8 @@ Mỗi lần bạn `git push` lên nhánh `main`, Vercel sẽ tự động build 
 
 - **Đổi màu / phông chữ:** sửa biến CSS trong `src/style.css` (khối `:root`).
 - **Đổi nội dung / quy tắc soạn giáo án:** sửa `api/_prompts.js`.
-- **Đổi model AI:** đặt biến môi trường `GEMINI_MODEL` (mặc định `gemini-3.1-flash-lite`).
+- **Đổi model AI:** đặt biến môi trường `CLAUDE_MODEL` (mặc định `claude-opus-5`).
+- **Khi model từ chối nội dung:** app bật `fallbacks: "default"`, API tự chạy lại yêu cầu trên model dự phòng phù hợp.
 - **Thời gian chờ:** `vercel.json` cho phép hàm chạy tối đa 300 giây, đủ cho giáo án chi tiết.
 - **Tên người tạo / thương hiệu:** sửa trực tiếp trong `index.html` (header, footer).
 

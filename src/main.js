@@ -385,10 +385,12 @@ document.getElementById('genBtn').addEventListener('click', async () => {
   const expected = { chi_tiet: 45000, vua: 25000, gon: 14000 }[doDai];
 
   try {
-    const plan = await generateLessonPlan(payload, (n) => {
+    const plan = await generateLessonPlan(payload, (n, thinking) => {
       const sub = document.getElementById('loadingSub');
       const bar = document.getElementById('progressBar');
-      if (sub) sub.textContent = `Đã viết được ${n.toLocaleString('vi-VN')} ký tự...`;
+      if (sub) sub.textContent = thinking
+        ? 'Claude đang phân tích đề tài trước khi viết...'
+        : `Đã viết được ${n.toLocaleString('vi-VN')} ký tự...`;
       if (bar) bar.style.width = Math.min(96, (n / expected) * 100) + '%';
     });
     if (!plan?.cach_tien_hanh?.length) throw new Error('Giáo án trả về thiếu phần Cách tiến hành. Vui lòng thử lại.');

@@ -1,13 +1,13 @@
 import { defineConfig, loadEnv } from 'vite';
 
 // Cho phép `npm run dev` chạy luôn route /api/generate (giống Vercel),
-// đọc GEMINI_API_KEY từ file .env.
+// đọc ANTHROPIC_API_KEY từ file .env.
 function localApi() {
   return {
     name: 'local-api',
     configureServer(server) {
       const env = loadEnv(server.config.mode, process.cwd(), '');
-      for (const k of ['GEMINI_API_KEY', 'GEMINI_MODEL', 'GEMINI_API_BASE']) {
+      for (const k of ['ANTHROPIC_API_KEY', 'CLAUDE_MODEL', 'ANTHROPIC_BASE_URL']) {
         if (env[k] && !process.env[k]) process.env[k] = env[k];
       }
       server.middlewares.use('/api/generate', async (req, res) => {

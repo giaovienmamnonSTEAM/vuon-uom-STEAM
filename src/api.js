@@ -1,6 +1,8 @@
 /* ============ CALL API ============
    Gọi tới serverless function /api/generate (api/generate.js).
-   Server ghép prompt hệ thống, gọi Gemini dạng stream (SSE) và chuyển tiếp về đây.
+   Server ghép prompt hệ thống, gọi Claude dạng stream và chuyển tiếp về đây
+   theo SSE: {text} từng đoạn chữ, {thinking} khi Claude đang suy nghĩ,
+   {done, stop_reason} khi xong, {error} khi lỗi.
 */
 
 async function streamGenerate(mode, payload, onProgress) {
@@ -17,7 +19,7 @@ async function streamGenerate(mode, payload, onProgress) {
       detail = errBody?.error?.message || errBody?.error || '';
     } catch (_) {}
     if (response.status === 404) {
-      detail = 'Không tìm thấy /api/generate. Hãy chạy bằng "npm run dev" (có file .env chứa GEMINI_API_KEY) hoặc deploy lên Vercel.';
+      detail = 'Không tìm thấy /api/generate. Hãy chạy bằng "npm run dev" (có file .env chứa ANTHROPIC_API_KEY) hoặc deploy lên Vercel.';
     }
     throw new Error(`Lỗi kết nối API (${response.status}). ${detail}`);
   }
@@ -26,16 +28,14 @@ async function streamGenerate(mode, payload, onProgress) {
   const decoder = new TextDecoder();
   let buffer = '';
   let text = '';
-  let finishReason = '';
+  let stopReason = '';
+  let thinking = false;
 
   const handleEvent = (json) => {
-    if (json.error) throw new Error(json.error.message || 'Lỗi từ Gemini.');
-    const cand = json.candidates?.[0];
-    if (!cand) return;
-    for (const part of cand.content?.parts || []) {
-      if (part.text && !part.thought) text += part.text;
-    }
-    if (cand.finishReason) finishReason = cand.finishReason;
+    if (json.error) throw new Error(json.error);
+    if (json.thinking) thinking = true;
+    if (json.text) text += json.text;
+    if (json.done) stopReason = json.stop_reason || '';
   };
 
   for (;;) {
@@ -51,13 +51,13 @@ async function streamGenerate(mode, payload, onProgress) {
       let json;
       try { json = JSON.parse(data); } catch { continue; }
       handleEvent(json);
-      onProgress?.(text.length);
+      onProgress?.(text.length, thinking && !text);
     }
     if (done) break;
   }
 
   if (!text.trim()) {
-    throw new Error(finishReason === 'SAFETY'
+    throw new Error(stopReason === 'refusal'
       ? 'AI từ chối nội dung này. Hãy thử diễn đạt lại đề tài.'
       : 'Không nhận được nội dung từ AI.');
   }
@@ -65,7 +65,10 @@ async function streamGenerate(mode, payload, onProgress) {
   try {
     return parseJson(text);
   } catch (e) {
-    if (finishReason === 'MAX_TOKENS') {
+    if (!stopReason) {
+      throw new Error('Kết nối bị ngắt giữa chừng (máy chủ có thể đã hết thời gian chờ). Hãy thử lại hoặc chọn độ dài "Vừa".');
+    }
+    if (stopReason === 'max_tokens') {
       throw new Error('Giáo án quá dài nên AI bị cắt giữa chừng. Hãy chọn độ dài "Vừa" hoặc "Gọn" rồi thử lại.');
     }
     throw e;
