@@ -13,7 +13,7 @@ const FIELDS = [
   { name: 'namHoc', label: 'Năm học', placeholder: 'VD: 2026 – 2027' }
 ];
 
-export default function SettingsPage({ settings, onSave, onClear, prefs, onPrefs, aiStatus, onRecheck, storageOK }) {
+export default function SettingsPage({ settings, onSave, onClear, prefs, onPrefs, aiStatus, onRecheck, storageOK, storageMode }) {
   const { toast, confirm } = useUI();
   const [form, setForm] = useState(settings);
   const [code, setCode] = useState(prefs.accessCode || '');
@@ -55,7 +55,9 @@ export default function SettingsPage({ settings, onSave, onClear, prefs, onPrefs
           ))}
         </div>
         <div className="rounded-xl bg-vang/50 px-4 py-3 text-sm text-amber-900 ring-1 ring-amber-200">
-          {storageOK
+          {storageMode === 'cloud'
+            ? '💾 Thông tin được lưu trong vùng riêng của tài khoản Claude của bạn: dùng máy khác với cùng tài khoản vẫn thấy, người khác không xem được. Khi soạn bằng AI, thông tin cần thiết được gửi kèm yêu cầu tới Claude.'
+            : storageOK
             ? '💾 Thông tin được lưu trong trình duyệt của máy đang dùng, không gửi lên máy chủ (trừ khi bạn soạn bằng AI: khi đó thông tin cần thiết được gửi kèm yêu cầu để AI soạn). Dữ liệu không đồng bộ giữa các thiết bị: dùng máy khác thì cần nhập lại.'
             : '⚠️ Trình duyệt đang chặn lưu trữ (có thể do chế độ ẩn danh), thông tin sẽ mất khi đóng trang.'}
         </div>
@@ -88,8 +90,11 @@ export default function SettingsPage({ settings, onSave, onClear, prefs, onPrefs
           </div>
         )}
         <button className="btn-ghost" onClick={onRecheck}>🔄 Kiểm tra lại kết nối</button>
+        {aiStatus.mode === 'claude' && (
+          <p className="text-sm text-slate-600">Trang đang mở trên claude.ai: AI dùng chính tài khoản Claude của người đang soạn, không cần API key. Lần đầu bấm soạn, Claude sẽ hỏi bạn có cho phép trang này dùng Claude không.</p>
+        )}
         <details className="text-sm text-slate-600">
-          <summary className="cursor-pointer font-semibold text-slate-700">Dành cho quản trị viên: cách bật AI</summary>
+          <summary className="cursor-pointer font-semibold text-slate-700">Dành cho quản trị viên: bật AI khi tự đưa lên máy chủ riêng (Vercel)</summary>
           <ol className="mt-2 list-decimal space-y-1 pl-5">
             <li>Đưa ứng dụng lên Vercel (thư mục gốc dự án: <code>tro-ly-truyen-thong</code>).</li>
             <li>Vào Settings → Environment Variables, thêm <code>ANTHROPIC_API_KEY</code> (API key Claude của nhà trường).</li>

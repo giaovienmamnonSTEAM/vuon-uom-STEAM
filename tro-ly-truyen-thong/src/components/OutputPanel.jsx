@@ -1,6 +1,6 @@
 // Khung kết quả: xem, chỉnh sửa trực tiếp, sao chép, tải .txt, in, rút gọn, tạo phiên bản mới, xóa.
 import { useEffect, useRef, useState } from 'react';
-import { copyText, downloadTxt, printText } from '../lib/exporters.js';
+import { copyText, downloadTxt, printText, inClaude } from '../lib/exporters.js';
 import { Spinner, useUI } from './UI.jsx';
 
 export default function OutputPanel({ output, onTextChange, onClear, onRegenerate, onShorten, busy, emptyHint }) {
@@ -45,9 +45,14 @@ export default function OutputPanel({ output, onTextChange, onClear, onRegenerat
     }
   };
 
-  const handleDownload = () => {
-    const name = downloadTxt(text, output?.title || 'noi-dung');
-    toast(`Đã tải xuống tệp ${name}`);
+  const handleDownload = async () => {
+    const r = await downloadTxt(text, output?.title || 'noi-dung');
+    toast(r.ok ? `Đã lưu tệp ${r.name}` : r.message, r.ok ? 'ok' : 'error');
+  };
+
+  const handlePrint = async () => {
+    const r = await printText(text, output?.title || 'Nội dung');
+    if (r.message) toast(r.message, r.ok ? 'info' : 'error');
   };
 
   if (!has && !busy) {
@@ -115,7 +120,7 @@ export default function OutputPanel({ output, onTextChange, onClear, onRegenerat
           {busy === 'regen' ? <Spinner /> : '🔄'} Phiên bản mới
         </button>
         <button className="btn-ghost" onClick={handleDownload} disabled={!has || !!busy}>⬇️ Tải .txt</button>
-        <button className="btn-ghost" onClick={() => printText(text, output?.title)} disabled={!has || !!busy}>🖨️ In</button>
+        <button className="btn-ghost" onClick={handlePrint} title={inClaude() ? 'Lưu bản in khổ A4 (.html) để mở và in' : 'In nội dung'} disabled={!has || !!busy}>🖨️ In</button>
         <button className="btn-danger col-span-2" onClick={handleClear} disabled={!has || !!busy}>🗑️ Xóa nội dung</button>
       </div>
     </section>

@@ -15,7 +15,7 @@ function fmt(ts) {
 
 const norm = (s) => removeDiacritics(String(s || '')).toLowerCase();
 
-export default function HistoryPage({ history, onOpen, onDelete, onDeleteAll, onUpdate, storageOK }) {
+export default function HistoryPage({ history, onOpen, onDelete, onDeleteAll, onUpdate, storageOK, storageMode }) {
   const { toast, confirm } = useUI();
   const [q, setQ] = useState('');
   const [type, setType] = useState('');
@@ -60,7 +60,11 @@ export default function HistoryPage({ history, onOpen, onDelete, onDeleteAll, on
       </div>
 
       <div className="rounded-xl bg-vang/50 px-4 py-3 text-sm text-amber-900 ring-1 ring-amber-200">
-        {storageOK
+        {storageMode === 'cloud'
+          ? 'Lịch sử được lưu trong vùng riêng của tài khoản Claude của bạn (tối đa 300 mục gần nhất): mở trang này trên máy khác bằng cùng tài khoản vẫn thấy. Người khác, kể cả người chia sẻ trang, không xem được.'
+          : storageMode === 'checking'
+            ? 'Đang tải lịch sử từ tài khoản Claude…'
+            : storageOK
           ? 'Lịch sử chỉ được lưu trong trình duyệt của máy này (tối đa 300 mục gần nhất), không lưu trên máy chủ và không đồng bộ giữa các thiết bị. Xóa dữ liệu trình duyệt sẽ làm mất lịch sử — hãy tải .txt những nội dung quan trọng.'
           : 'Trình duyệt đang chặn lưu trữ (có thể do chế độ ẩn danh). Lịch sử chỉ tồn tại đến khi bạn đóng trang.'}
       </div>

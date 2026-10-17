@@ -101,3 +101,12 @@ export function buildUserMessage({ task, data = {}, labels = {}, settings = {}, 
   if (variant > 0) parts.push(`Đây là lần soạn thứ ${variant + 1}: hãy viết một phiên bản mới với câu chữ khác các lần trước.`);
   return parts.join('\n\n');
 }
+
+// Bỏ các câu dẫn kiểu "Dưới đây là…" và ký hiệu Markdown nếu mô hình lỡ thêm.
+export function cleanOutput(text) {
+  let x = String(text || '').trim();
+  x = x.replace(/^(dưới đây là|sau đây là|đây là)[^\n]*:\s*\n+/i, '');
+  x = x.replace(/\*\*(.+?)\*\*/g, '$1').replace(/^#{1,6}\s+/gm, '');
+  x = x.replace(/^```[a-z]*\n?|\n?```$/g, '');
+  return x.trim();
+}

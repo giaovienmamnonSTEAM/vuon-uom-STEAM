@@ -4,6 +4,18 @@
 
 Ứng dụng web giúp giáo viên mầm non soạn nhanh thông báo, tin nhắn phụ huynh, thư mời, bản tin tuần, bài tuyên truyền và bài truyền thông của nhà trường. Giao diện tiếng Việt, dùng tốt trên máy tính, máy tính bảng và điện thoại.
 
+## 🌐 Dùng ngay trên claude.ai (không cần Vercel)
+
+Bản đã đăng: **https://claude.ai/artifact/EvE3bE1fZf8W5pwDZYUZqV** (mặc định chỉ chủ sở hữu mở được; muốn đồng nghiệp dùng thì bấm **Share** trên trang).
+
+Khi mở trên claude.ai:
+- **AI:** trang nhờ chính Claude của người đang dùng soạn nội dung — không cần API key. Lần đầu bấm soạn, Claude hỏi có cho phép trang dùng Claude không. Lượt dùng tính vào hạn mức tài khoản Claude của người đó.
+- **Lưu trữ:** thông tin trường và lịch sử lưu trong vùng riêng của tài khoản Claude từng người (người khác, kể cả người chia sẻ trang, không xem được), mở máy khác cùng tài khoản vẫn thấy. Người chỉ có quyền *xem* (Viewer) thì không ghi được vùng này — ứng dụng tự chuyển về lưu trên trình duyệt. Muốn đồng nghiệp lưu được, chia sẻ ở mức **Contributor** trở lên.
+- **Tải .txt:** đi qua hộp xác nhận lưu tệp của Claude.
+- **In:** khung Artifact không mở được hộp thoại in, nên nút **In** lưu một tệp `…-ban-in.html` khổ A4 (Times New Roman); mở tệp đó trong trình duyệt là hộp thoại in tự hiện ra.
+
+Cập nhật bản trên claude.ai sau khi sửa mã: `npm run build:artifact` (tạo `artifact/tro-ly-truyen-thong.html`), rồi đăng lại tệp này.
+
 ## ✨ Chức năng
 
 | Chức năng | Nội dung |
@@ -20,14 +32,14 @@
 
 Khung kết quả có: **Sao chép · Chỉnh sửa · Rút gọn · Phiên bản mới · Tải .txt · In · Xóa nội dung** (xóa luôn hỏi xác nhận).
 
-## 🤖 Hai chế độ soạn — luôn ghi rõ nguồn
+## 🤖 Các chế độ soạn — luôn ghi rõ nguồn
 
 1. **Soạn theo mẫu (không dùng AI)** — mặc định, chạy ngay trên trình duyệt, không cần mạng hay API key. Ghép câu chữ từ mẫu có sẵn và kho kiến thức tuyên truyền; phần biên tập chạy theo quy tắc (khoảng trắng, dấu câu, viết hoa, một số lỗi chính tả thường gặp, cách xưng hô, bố cục). Không viết lại sâu về ý như AI.
-2. **Soạn bằng AI (Claude)** — chỉ bật khi máy chủ có API key thật. Trình duyệt hỏi `/api/status`; nếu chưa cấu hình, ứng dụng hiển thị “AI chưa được kết nối” và dùng chế độ theo mẫu. Không bao giờ giả vờ AI đang chạy.
+2. **Soạn bằng AI (Claude)** — trên claude.ai: dùng Claude của người dùng (xem trên). Trên máy chủ riêng: chỉ bật khi máy chủ có API key thật. Trình duyệt hỏi `/api/status`; nếu chưa cấu hình, ứng dụng hiển thị “AI chưa được kết nối” và dùng chế độ theo mẫu. Không bao giờ giả vờ AI đang chạy.
 
 Mỗi kết quả và mỗi mục lịch sử đều có nhãn **“Soạn bằng AI”** hoặc **“Soạn theo mẫu”**.
 
-### Bật AI (quản trị viên)
+### Bật AI khi tự đưa lên Vercel (không bắt buộc)
 
 1. Trên Vercel: **Add New Project** → chọn repo → **Root Directory: `tro-ly-truyen-thong`** → Deploy.
 2. **Settings → Environment Variables**:

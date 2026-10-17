@@ -10,7 +10,7 @@
 //                      "Thiết lập thông tin" mới dùng được AI (tránh người lạ dùng tốn phí)
 
 import Anthropic from '@anthropic-ai/sdk';
-import { SYSTEM_PROMPT, TASKS, buildUserMessage } from './_lib/prompts.js';
+import { SYSTEM_PROMPT, TASKS, buildUserMessage, cleanOutput } from './_lib/prompts.js';
 
 const DEFAULT_MODEL = 'claude-opus-5-5';
 
@@ -34,14 +34,7 @@ async function readBody(req) {
   return JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}');
 }
 
-// Bỏ các câu dẫn kiểu "Dưới đây là…" và ký hiệu Markdown nếu mô hình lỡ thêm.
-export function cleanOutput(text) {
-  let x = String(text || '').trim();
-  x = x.replace(/^(dưới đây là|sau đây là|đây là)[^\n]*:\s*\n+/i, '');
-  x = x.replace(/\*\*(.+?)\*\*/g, '$1').replace(/^#{1,6}\s+/gm, '');
-  x = x.replace(/^```[a-z]*\n?|\n?```$/g, '');
-  return x.trim();
-}
+export { cleanOutput };
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

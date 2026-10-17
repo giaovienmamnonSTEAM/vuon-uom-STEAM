@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { MODULES, getModule, initialFormData } from './lib/catalog.js';
 import { checkAIStatus } from './lib/aiClient.js';
 import * as store from './lib/storage.js';
+import * as cloud from './lib/cloud.js';
+import logoUrl from './assets/logo.svg';
 import { useUI } from './components/UI.jsx';
 import HomePage from './pages/HomePage.jsx';
 import ModulePage from './pages/ModulePage.jsx';
@@ -32,6 +34,8 @@ export default function App() {
   const [prefs, setPrefs] = useState(store.loadPrefs);
   const [history, setHistory] = useState(store.loadHistory);
   const [aiStatus, setAiStatus] = useState({ loading: true, connected: false });
+  // 'local': localStorage trên máy này · 'cloud': theo tài khoản Claude · 'checking'
+  const [storageMode, setStorageMode] = useState(() => (typeof window !== 'undefined' && window.claude?.use ? 'checking' : 'local'));
   const [moduleStates, setModuleStates] = useState(() =>
     Object.fromEntries(MODULES.map((m) => [m.id, { data: initialFormData(m, store.loadSettings()), output: null, variant: 0, historyId: null }]))
   );
@@ -48,11 +52,62 @@ export default function App() {
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
   const go = useCallback((id) => {
-    if (window.location.hash === `#/${id}`) {
+    if (window.location.hash === `#${id}`) {
       setMenuOpen(false);
       return;
     }
-    window.location.hash = `/${id}`;
+    window.location.hash = id;
+  }, []);
+
+  // ---- Lưu theo tài khoản Claude (khi mở trên claude.ai) ----
+  const cloudFail = useCallback(() => {
+    if (!cloud.cloudActive()) return;
+    cloud.disableCloud();
+    setStorageMode('local');
+    toast('Không lưu được vào tài khoản Claude (có thể bạn chỉ có quyền xem). Từ giờ dữ liệu được lưu trên máy này.', 'error');
+  }, [toast]);
+  const sync = useCallback((fn) => {
+    if (!cloud.cloudActive()) return;
+    Promise.resolve()
+      .then(fn)
+      .catch(cloudFail);
+  }, [cloudFail]);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const ok = await cloud.initCloud();
+      if (!alive) return;
+      if (!ok) return setStorageMode('local');
+      try {
+        const remote = await cloud.loadCloud();
+        if (!alive) return;
+        const localSettings = store.loadSettings();
+        const localHistory = store.loadHistory();
+        if (remote.settings) {
+          const s = { ...store.EMPTY_SETTINGS, ...remote.settings };
+          setSettings(s);
+          store.saveSettings(s);
+        } else if (Object.values(localSettings).some(Boolean)) {
+          await cloud.cloudSaveSettings(localSettings);
+        }
+        if (remote.prefs) setPrefs((p) => ({ ...p, useAI: remote.prefs.useAI !== false }));
+        // Gộp lịch sử: bản trên tài khoản + bản chỉ có trên máy này (tải lên)
+        const ids = new Set(remote.history.map((h) => h.id));
+        const onlyLocal = localHistory.filter((h) => !ids.has(h.id));
+        for (const h of onlyLocal) await cloud.cloudPutHistory(h);
+        const merged = [...remote.history, ...onlyLocal].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).slice(0, 300);
+        setHistory(merged);
+        store.saveHistory(merged);
+        setStorageMode('cloud');
+      } catch {
+        cloud.disableCloud();
+        if (alive) setStorageMode('local');
+      }
+    })();
+    return () => {
+      alive = false;
+    };
   }, []);
 
   // ---- Kết nối AI ----
@@ -79,13 +134,23 @@ export default function App() {
     const now = Date.now();
     const item = { id: store.newId(), createdAt: now, updatedAt: now, ...entry };
     setHistory((list) => persistHistory([item, ...list]));
+    sync(() => cloud.cloudPutHistory(item));
     return item.id;
-  }, []);
+  }, [sync]);
   const updateHistory = useCallback((id, patch) => {
-    setHistory((list) => persistHistory(list.map((h) => (h.id === id ? { ...h, ...patch, updatedAt: Date.now() } : h))));
-  }, []);
-  const deleteHistory = useCallback((id) => setHistory((list) => persistHistory(list.filter((h) => h.id !== id))), []);
-  const deleteAllHistory = useCallback(() => setHistory(persistHistory([])), []);
+    const full = { ...patch, updatedAt: Date.now() };
+    setHistory((list) => persistHistory(list.map((h) => (h.id === id ? { ...h, ...full } : h))));
+    sync(() => cloud.cloudPatchHistory(id, full));
+  }, [sync]);
+  const deleteHistory = useCallback((id) => {
+    setHistory((list) => persistHistory(list.filter((h) => h.id !== id)));
+    sync(() => cloud.cloudDeleteHistory(id));
+  }, [sync]);
+  const deleteAllHistory = useCallback(() => {
+    const ids = history.map((h) => h.id);
+    setHistory(persistHistory([]));
+    sync(() => cloud.cloudDeleteAll(ids));
+  }, [sync, history]);
 
   function openHistory(h) {
     const output = { text: h.text, title: h.title, source: h.source, notes: [] };
@@ -113,15 +178,18 @@ export default function App() {
       }
       return next;
     });
-    return store.saveSettings(s);
+    sync(() => cloud.cloudSaveSettings(s));
+    return store.saveSettings(s) || cloud.cloudActive();
   }
   function clearSettings() {
     setSettings({ ...store.EMPTY_SETTINGS });
     store.clearSettings();
+    sync(() => cloud.cloudClearSettings());
   }
   function updatePrefs(p) {
     setPrefs(p);
     store.savePrefs(p);
+    sync(() => cloud.cloudSavePrefs(p));
   }
 
   const setModuleState = (id) => (updater) =>
@@ -147,9 +215,9 @@ export default function App() {
   } else if (route === 'bien-tap') {
     page = <EditorPage state={editorState} setState={setEditorState} settings={settings} ai={ai} onSaved={addHistory} onUpdateHistory={updateHistory} />;
   } else if (route === 'lich-su') {
-    page = <HistoryPage history={history} onOpen={openHistory} onDelete={deleteHistory} onDeleteAll={deleteAllHistory} onUpdate={updateHistory} storageOK={storageOK} />;
+    page = <HistoryPage history={history} onOpen={openHistory} onDelete={deleteHistory} onDeleteAll={deleteAllHistory} onUpdate={updateHistory} storageOK={storageOK} storageMode={storageMode} />;
   } else if (route === 'thiet-lap') {
-    page = <SettingsPage settings={settings} onSave={saveSettings} onClear={clearSettings} prefs={prefs} onPrefs={updatePrefs} aiStatus={aiStatus} onRecheck={recheck} storageOK={storageOK} />;
+    page = <SettingsPage settings={settings} onSave={saveSettings} onClear={clearSettings} prefs={prefs} onPrefs={updatePrefs} aiStatus={aiStatus} onRecheck={recheck} storageOK={storageOK} storageMode={storageMode} />;
   } else {
     page = <HomePage go={go} aiStatus={aiStatus} prefs={prefs} settings={settings} historyCount={history.length} />;
   }
@@ -164,7 +232,7 @@ export default function App() {
           return (
             <li key={n.id}>
               <a
-                href={`#/${n.id}`}
+                href={`#${n.id}`}
                 aria-current={active ? 'page' : undefined}
                 className={`flex min-h-[44px] items-center gap-3 rounded-xl px-3 py-2 text-[15px] font-medium transition ${
                   active ? 'bg-sky-500 text-white shadow-sm' : 'text-slate-700 hover:bg-sky-100'
@@ -209,7 +277,7 @@ export default function App() {
         {/* Thanh điều hướng bên trái trên máy tính */}
         <aside className="sticky top-6 hidden h-[calc(100vh-3rem)] w-60 shrink-0 flex-col overflow-y-auto lg:flex print:hidden">
           <div className="mb-4 flex items-center gap-2 px-2">
-            <img src="/favicon.svg" alt="" className="h-9 w-9" />
+            <img src={logoUrl} alt="" className="h-9 w-9" />
             <span className="text-sm font-bold leading-tight text-sky-800">Trợ lý Truyền thông<br />Mầm non</span>
           </div>
           {navList}
@@ -226,7 +294,9 @@ export default function App() {
           </header>
           {page}
           <footer className="mt-10 border-t border-sky-100 pt-4 text-center text-xs text-slate-500 print:hidden">
-            Dữ liệu được lưu trên trình duyệt của máy này, không đồng bộ giữa các thiết bị. Luôn đọc lại nội dung trước khi gửi phụ huynh.
+            {storageMode === 'cloud'
+              ? 'Dữ liệu được lưu trong vùng riêng của tài khoản Claude của bạn (người khác không xem được). Luôn đọc lại nội dung trước khi gửi phụ huynh.'
+              : 'Dữ liệu được lưu trên trình duyệt của máy này, không đồng bộ giữa các thiết bị. Luôn đọc lại nội dung trước khi gửi phụ huynh.'}
           </footer>
         </main>
       </div>
