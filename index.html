@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vườn Ươm STEAM — Soạn giáo án mầm non</title>
-<meta name="description" content="Công cụ soạn giáo án STEAM mầm non theo quy trình 5E, EDP, Dự án STEAM cho Nhà trẻ và Mẫu giáo. Tạo bởi Trần Quỳ - Giáo viên mầm non STEAM.">
+<meta name="description" content="Soạn giáo án STEAM mầm non theo quy trình 5E, EDP cho Nhà trẻ 24–36 tháng và Mẫu giáo 3, 4, 5 tuổi, không cần API. Tạo bởi Trần Quỳ - Giáo viên mầm non STEAM.">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -15,7 +15,7 @@
   <div class="logo-mark" id="logoMark"></div>
   <div class="brand-text">
     <h1>Vườn Ươm STEAM</h1>
-    <p>Soạn giáo án STEAM mầm non nhanh chóng, đúng chuẩn · by Trần Quỳ – Giáo viên mầm non STEAM</p>
+    <p>Soạn giáo án STEAM mầm non theo khung chuẩn — không cần API · by Trần Quỳ – Giáo viên mầm non STEAM</p>
   </div>
   <div class="petals-legend">
     <span class="petal-chip"><span class="dot" style="background:var(--s-blue)"></span>S · Khoa học</span>
@@ -30,60 +30,90 @@
   <!-- FORM -->
   <section class="form-card">
     <h2>🌱 Thông tin giáo án</h2>
-    <p class="sub">Điền thông tin, Vườn Ươm STEAM sẽ soạn giáo án đầy đủ theo đúng khung của tài liệu.</p>
+    <p class="sub">App tự lắp giáo án theo khung STEAM (không cần mạng, không cần API). Nhập càng cụ thể, giáo án càng ít chỗ «…» phải điền thêm.</p>
+
+    <label for="preset">Giáo án mẫu <span class="opt">(chọn để xem ngay, sau đó sửa theo lớp mình)</span></label>
+    <select id="preset"><option value="">— Không dùng mẫu —</option></select>
 
     <label>Độ tuổi</label>
-    <div class="age-grid" id="ageGrid">
-      <button type="button" class="age-btn" data-age="Nhà trẻ 24-36 tháng">Nhà trẻ<br>24–36 tháng</button>
-      <button type="button" class="age-btn" data-age="Mẫu giáo bé 3-4 tuổi">Mẫu giáo bé<br>3–4 tuổi</button>
-      <button type="button" class="age-btn" data-age="Mẫu giáo nhỡ 4-5 tuổi">Mẫu giáo nhỡ<br>4–5 tuổi</button>
-      <button type="button" class="age-btn" data-age="Mẫu giáo lớn 5-6 tuổi">Mẫu giáo lớn<br>5–6 tuổi</button>
-    </div>
+    <div class="age-grid" id="ageGrid"></div>
 
-    <label for="chuDe">Chủ đề <span class="opt">(chủ đề lớn, VD: Thế giới động vật)</span></label>
-    <input type="text" id="chuDe" placeholder="VD: Thế giới động vật">
+    <label for="linhVuc">Lĩnh vực / loại hoạt động</label>
+    <select id="linhVuc"><option value="">— Chọn độ tuổi trước —</option></select>
 
-    <label for="deTai">Đề tài <span class="opt">(hoạt động cụ thể, VD: Khám phá con gà / Làm chuồng cho gà)</span></label>
-    <textarea id="deTai" placeholder="VD: Bé làm chuồng gà từ vật liệu tái chế"></textarea>
+    <label for="chuDe">Chủ đề</label>
+    <input type="text" id="chuDe" maxlength="200" placeholder="VD: Nước và các hiện tượng tự nhiên">
 
-    <label>Quy trình STEAM <span class="opt">(để trống = tự động chọn phù hợp)</span></label>
+    <label for="deTai">Tên hoạt động / đề tài</label>
+    <input type="text" id="deTai" maxlength="200" placeholder="VD: Làm thuyền giúp các con vật qua sông">
+
+    <label>Quy trình STEAM</label>
     <div class="quy-trinh-grid" id="quyTrinhGrid">
-      <label class="qt-option active" data-qt="auto">
+      <label class="qt-option active">
         <input type="radio" name="quytrinh" value="auto" checked>
-        <div><div class="qt-title">🤖 Tự động chọn</div><div class="qt-desc">Hệ thống chọn 5E / EDP / Dự án phù hợp với đề tài</div></div>
+        <div><div class="qt-title">🤖 Tự chọn theo lĩnh vực</div><div class="qt-desc">Tạo hình, chế tạo, nấu ăn → EDP; còn lại → 5E</div></div>
       </label>
-      <label class="qt-option" data-qt="5E">
+      <label class="qt-option">
         <input type="radio" name="quytrinh" value="5E">
-        <div><div class="qt-title">🔍 Quy trình 5E</div><div class="qt-desc">Khám phá, LQ Toán, LQ chữ cái, Thơ truyện, Âm nhạc, Thể chất...</div></div>
+        <div><div class="qt-title">🔍 Quy trình 5E</div><div class="qt-desc">Tìm tòi, khám phá: khoa học, xã hội, toán, chữ cái, thơ, truyện, âm nhạc, thể chất</div></div>
       </label>
-      <label class="qt-option" data-qt="EDP">
+      <label class="qt-option">
         <input type="radio" name="quytrinh" value="EDP">
-        <div><div class="qt-title">🛠️ Quy trình EDP</div><div class="qt-desc">Tạo hình, chế tạo, làm sản phẩm, thiết kế mô hình</div></div>
-      </label>
-      <label class="qt-option" data-qt="Project">
-        <input type="radio" name="quytrinh" value="Project">
-        <div><div class="qt-title">📁 Dự án STEAM</div><div class="qt-desc">Hoạt động trải dài nhiều ngày, nhiều tiết liên kết</div></div>
+        <div><div class="qt-title">🛠️ Quy trình EDP</div><div class="qt-desc">Tạo ra sản phẩm dùng được thật: chạy, nổi, đội, ăn, chứa được...</div></div>
       </label>
     </div>
+    <div class="field-hint" id="processHint"></div>
 
-    <label for="ghiChu">Yêu cầu thêm <span class="opt">(không bắt buộc)</span></label>
-    <textarea id="ghiChu" placeholder="VD: lớp có 25 trẻ, ưu tiên vật liệu tái chế, tích hợp thêm bài hát..."></textarea>
+    <label for="doiTuong" id="doiTuongLabel">Sản phẩm trẻ làm</label>
+    <input type="text" id="doiTuong" maxlength="120" placeholder="VD: chiếc thuyền">
 
-    <button class="generate-btn" id="genBtn">🌼 Soạn giáo án ngay</button>
-    <div class="hint-row">Giáo án được soạn theo khung 5 thành tố S-T-E-A-M, không theo khung Kiến thức/Kỹ năng/Thái độ truyền thống.</div>
+    <div id="edpFields">
+      <label class="check"><input type="checkbox" id="dungDuoc" checked> Sản phẩm dùng được thật (chạy, nổi, đội, ăn, chứa được...)</label>
+      <label for="vanDe">Tình huống có vấn đề</label>
+      <textarea id="vanDe" maxlength="400" placeholder="VD: Cây cầu bị nước cuốn trôi, các con vật không qua sông về nhà được"></textarea>
+      <label for="tieuChi">Tiêu chí sản phẩm <span class="opt">(mỗi dòng một tiêu chí)</span></label>
+      <textarea id="tieuChi" maxlength="600" placeholder="Nổi được trên mặt nước&#10;Chở được 3 con vật mà không bị lật"></textarea>
+    </div>
+
+    <div id="e5Fields" hidden>
+      <label for="dacDiem">Đặc điểm cần khám phá <span class="opt">(mỗi dòng một ý)</span></label>
+      <textarea id="dacDiem" maxlength="600" placeholder="mào đỏ&#10;mỏ nhọn&#10;tiếng kêu &quot;ò ó o&quot;"></textarea>
+      <label for="cachKhamPha">Trẻ khám phá bằng cách</label>
+      <input type="text" id="cachKhamPha" maxlength="200" placeholder="VD: quan sát, sờ, thả vào nước và so sánh">
+    </div>
+
+    <label for="nguyenLieu" id="nguyenLieuLabel">Nguyên vật liệu <span class="opt">(mỗi dòng một thứ)</span></label>
+    <textarea id="nguyenLieu" maxlength="800" placeholder="chai nhựa sạch&#10;que kem&#10;nắp chai"></textarea>
+
+    <label for="dungCu">Dụng cụ trẻ tự sử dụng <span class="opt">(thành tố T – chỉ đồ trẻ tự cầm)</span></label>
+    <textarea id="dungCu" maxlength="400" placeholder="kéo thủ công đầu tròn&#10;băng dính"></textarea>
+
+    <label for="moDau">Bài hát / câu đố mở đầu</label>
+    <input type="text" id="moDau" maxlength="200" placeholder='VD: bài hát "Cá vàng bơi"'>
+
+    <label for="giaoDuc">Ý nghĩa giáo dục <span class="opt">(vẻ đẹp bên trong của A)</span></label>
+    <input type="text" id="giaoDuc" maxlength="300" placeholder="VD: biết giúp đỡ bạn bè khi gặp khó khăn">
+
+    <label for="soTre">Số trẻ <span class="opt">(không bắt buộc)</span></label>
+    <input type="text" id="soTre" maxlength="20" placeholder="VD: 25 trẻ">
+
+    <label for="phuHuynh">Phối hợp phụ huynh <span class="opt">(chỉ ghi khi cần, mỗi dòng một việc)</span></label>
+    <textarea id="phuHuynh" maxlength="400" placeholder="VD: Sưu tầm chai nhựa sạch"></textarea>
+
+    <button class="generate-btn" id="genBtn">🌼 Lập giáo án</button>
+    <div class="hint-row">Sau khi lập, bấm vào bất kỳ chữ nào trong giáo án để sửa trực tiếp, rồi tải file Word.</div>
+
+    <div class="history" id="historyBox" hidden>
+      <div class="history-title">📚 Giáo án đã soạn <span class="opt">(lưu trên máy này)</span></div>
+      <ul id="historyList"></ul>
+    </div>
   </section>
 
   <!-- RESULT -->
-  <section class="result-wrap" id="resultWrap">
-    <div class="empty-state">
-      <div class="big-flower" id="emptyFlower"></div>
-      <h3>Chưa có giáo án nào</h3>
-      <p>Chọn độ tuổi, nhập chủ đề và đề tài ở bên trái, rồi bấm "Soạn giáo án ngay". Vườn Ươm STEAM sẽ tạo giáo án đầy đủ: mục đích yêu cầu S-T-E-A-M, tiến hành chi tiết, bảng ghi chép, trò chơi, học liệu, gợi ý AI và phiếu đánh giá trẻ.</p>
-    </div>
-  </section>
+  <section class="result-wrap" id="resultWrap"></section>
 </main>
 
-<footer class="foot">Vườn Ươm STEAM · Công cụ hỗ trợ giáo viên mầm non soạn giáo án STEAM · Được tạo bởi Trần Quỳ – Giáo viên mầm non STEAM</footer>
+<footer class="foot">Vườn Ươm STEAM · Nguyên tắc theo "Công phá STEAM cùng Thầy Phúc" · Được tạo bởi Trần Quỳ – Giáo viên mầm non STEAM</footer>
 
 <div class="toast" id="toast"></div>
 
