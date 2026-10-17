@@ -2,6 +2,8 @@
 
 > Kết nối nhà trường – giáo viên – gia đình bằng những thông điệp yêu thương
 
+Người tạo: **Trần Thị Quỳ – Trường MN Tam Giang**.
+
 Ứng dụng web giúp giáo viên mầm non soạn nhanh thông báo, tin nhắn phụ huynh, thư mời, bản tin tuần, bài tuyên truyền và bài truyền thông của nhà trường. Giao diện tiếng Việt, dùng tốt trên máy tính, máy tính bảng và điện thoại.
 
 ## 🌐 Dùng ngay trên claude.ai (không cần Vercel)

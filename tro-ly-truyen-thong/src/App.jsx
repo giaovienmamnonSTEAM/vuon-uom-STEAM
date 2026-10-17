@@ -291,12 +291,14 @@ export default function App() {
           <header className="mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-sky-200 via-sky-100 to-vang/70 p-5 ring-1 ring-sky-200 sm:p-7 print:hidden">
             <h1 className="text-2xl font-bold tracking-tight text-sky-900 sm:text-3xl">TRỢ LÝ TRUYỀN THÔNG MẦM NON</h1>
             <p className="mt-2 text-[15px] text-sky-900/80 sm:text-base">Kết nối nhà trường – giáo viên – gia đình bằng những thông điệp yêu thương</p>
+            <p className="mt-3 text-sm font-medium text-sky-900/70">Người tạo: Trần Thị Quỳ – Trường MN Tam Giang</p>
           </header>
           {page}
           <footer className="mt-10 border-t border-sky-100 pt-4 text-center text-xs text-slate-500 print:hidden">
             {storageMode === 'cloud'
               ? 'Dữ liệu được lưu trong vùng riêng của tài khoản Claude của bạn (người khác không xem được). Luôn đọc lại nội dung trước khi gửi phụ huynh.'
               : 'Dữ liệu được lưu trên trình duyệt của máy này, không đồng bộ giữa các thiết bị. Luôn đọc lại nội dung trước khi gửi phụ huynh.'}
+            <span className="mt-1 block">Ứng dụng do Trần Thị Quỳ – Trường MN Tam Giang tạo.</span>
           </footer>
         </main>
       </div>
