@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { copyText, downloadTxt, printText, inClaude } from '../lib/exporters.js';
 import { Spinner, useUI } from './UI.jsx';
+import { EmptyArt, LoadingArt, SuccessArt } from '../illustrations/icons.jsx';
 
 // Các kiểu viết lại nhanh: áp lên văn bản đang có (không soạn lại từ đầu).
 const QUICK_REWRITES = [
@@ -22,6 +23,20 @@ export default function OutputPanel({ output, onTextChange, onClear, onRegenerat
   const text = output?.text || '';
   const has = text.trim().length > 0;
   const missingCount = (text.match(/\[CẦN BỔ SUNG/g) || []).length;
+
+  // Hiện biểu tượng "Đã xong" vài giây sau mỗi lần soạn / viết lại thành công
+  const [done, setDone] = useState(false);
+  const prev = useRef({ busy, text });
+  useEffect(() => {
+    const was = prev.current;
+    prev.current = { busy, text };
+    if (was.busy && !busy && text && text !== was.text) {
+      setDone(true);
+      const t = setTimeout(() => setDone(false), 4000);
+      return () => clearTimeout(t);
+    }
+  }, [busy, text]);
+  const loadingText = 'Cô đang chuẩn bị nội dung cho bạn...';
 
   useEffect(() => {
     if (editing && taRef.current) {
@@ -70,9 +85,19 @@ export default function OutputPanel({ output, onTextChange, onClear, onRegenerat
 
   if (!has && !busy) {
     return (
-      <div className="card flex min-h-[220px] flex-col items-center justify-center gap-2 p-6 text-center text-slate-500">
-        <div className="text-4xl" aria-hidden="true">📝</div>
+      <div className="card flex min-h-[260px] flex-col items-center justify-center gap-3 p-6 text-center text-slate-500">
+        <EmptyArt className="art w-44" />
         <p className="max-w-sm text-[15px]">{emptyHint || 'Nội dung sẽ hiển thị ở đây sau khi bạn bấm nút soạn.'}</p>
+      </div>
+    );
+  }
+
+  if (!has && busy) {
+    return (
+      <div className="card flex min-h-[260px] flex-col items-center justify-center gap-3 p-6 text-center" role="status" aria-live="polite">
+        <LoadingArt className="art w-48" />
+        <p className="flex items-center gap-2 text-[15px] font-semibold text-sky-800"><Spinner /> {loadingText}</p>
+        {usingAI && <p className="text-sm text-slate-500">AI thường cần 10–60 giây.</p>}
       </div>
     );
   }
@@ -80,7 +105,13 @@ export default function OutputPanel({ output, onTextChange, onClear, onRegenerat
   return (
     <section className="card overflow-hidden" aria-label="Kết quả">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-sky-100 bg-sky-50/60 px-4 py-3">
-        <h2 className="text-base font-bold text-slate-800">Kết quả</h2>
+        <div className="flex min-w-0 items-center gap-2">
+          {done && <SuccessArt className="pop-in h-8 w-8 shrink-0" />}
+          <div className="min-w-0">
+            <h2 className="text-base font-bold text-slate-800">{done ? 'Đã xong! Nội dung của bạn đây' : 'Kết quả'}</h2>
+            {output?.title && <p className="truncate text-sm text-slate-500" title={output.title}>{output.title}</p>}
+          </div>
+        </div>
         {output?.source && (
           <span className={`rounded-full px-3 py-1 text-xs font-semibold ${output.source === 'ai' ? 'bg-la text-green-900' : 'bg-vang text-amber-900'}`}>
             {output.source === 'ai' ? '✨ Soạn bằng AI' : '📋 Soạn theo mẫu (không dùng AI)'}
@@ -90,8 +121,11 @@ export default function OutputPanel({ output, onTextChange, onClear, onRegenerat
 
       <div className="relative">
         {busy && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center gap-2 bg-white/70 text-[15px] font-medium text-sky-800">
-            <Spinner /> {usingAI ? 'AI đang viết… thường mất 10–60 giây' : 'Đang soạn nội dung…'}
+          <div className="flex items-center gap-3 border-b border-sky-100 bg-vang/40 px-4 py-2" role="status" aria-live="polite">
+            <LoadingArt className="art w-16 shrink-0" />
+            <p className="flex items-center gap-2 text-sm font-semibold text-sky-800">
+              <Spinner /> {loadingText} {usingAI && <span className="font-normal text-slate-500">(nội dung cũ vẫn giữ bên dưới)</span>}
+            </p>
           </div>
         )}
         {editing ? (
@@ -161,7 +195,7 @@ export default function OutputPanel({ output, onTextChange, onClear, onRegenerat
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-2 border-t border-sky-100 p-3 sm:grid-cols-4">
+      <div className="flex flex-wrap gap-2 border-t border-sky-100 p-3 [&>button]:grow [&>button]:basis-[8rem] [&>button]:whitespace-nowrap">
         <button className="btn-primary" onClick={handleCopy} disabled={!has || !!busy}>📋 Sao chép</button>
         <button className="btn-soft" onClick={() => setEditing((v) => !v)} disabled={!has || !!busy} aria-pressed={editing}>
           {editing ? '✅ Xong' : '✏️ Chỉnh sửa'}
@@ -170,16 +204,16 @@ export default function OutputPanel({ output, onTextChange, onClear, onRegenerat
           {busy === 'shorten' ? <Spinner /> : '✂️'} Rút gọn
         </button>
         <button className="btn-soft" onClick={onRegenerate} disabled={!!busy} title="Soạn lại một phiên bản mới từ thông tin đã nhập">
-          {busy === 'regen' ? <Spinner /> : '🔄'} Tạo lại
+          {busy === 'regen' ? <Spinner /> : '🔄'} Tạo mới
         </button>
         {onRewrite && (
-          <button className="btn-soft col-span-2 sm:col-span-4" onClick={() => setRewriteOpen((v) => !v)} disabled={!has || !!busy} aria-expanded={rewriteOpen}>
+          <button className="btn-soft !basis-full" onClick={() => setRewriteOpen((v) => !v)} disabled={!has || !!busy} aria-expanded={rewriteOpen}>
             {busy === 'rewrite' ? <Spinner /> : '🪄'} Viết lại {rewriteOpen ? '▴' : '▾'}
           </button>
         )}
         <button className="btn-ghost" onClick={handleDownload} disabled={!has || !!busy}>⬇️ Tải .txt</button>
         <button className="btn-ghost" onClick={handlePrint} title={inClaude() ? 'Lưu bản in khổ A4 (.html) để mở và in' : 'In nội dung'} disabled={!has || !!busy}>🖨️ In</button>
-        <button className="btn-danger col-span-2" onClick={handleClear} disabled={!has || !!busy}>🗑️ Xóa nội dung</button>
+        <button className="btn-danger" onClick={handleClear} disabled={!has || !!busy}>🗑️ Xóa nội dung</button>
       </div>
     </section>
   );

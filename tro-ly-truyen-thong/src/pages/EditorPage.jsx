@@ -4,6 +4,8 @@ import OutputPanel from '../components/OutputPanel.jsx';
 import { Spinner, useUI } from '../components/UI.jsx';
 import { EDIT_ACTIONS, EDITOR_SAMPLE } from '../lib/catalog.js';
 import { editContent } from '../lib/compose.js';
+import IllustrationPicker from '../components/IllustrationPicker.jsx';
+import { ModuleIcon } from '../illustrations/icons.jsx';
 
 export default function EditorPage({ state, setState, settings, ai, onSaved, onUpdateHistory }) {
   const { toast, confirm } = useUI();
@@ -59,8 +61,13 @@ export default function EditorPage({ state, setState, settings, ai, onSaved, onU
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="flex items-center gap-2 text-xl font-bold text-slate-800 sm:text-2xl"><span aria-hidden="true">🪄</span> Biên tập và cải thiện nội dung</h2>
-        <p className="mt-1 text-[15px] text-slate-600">Dán nội dung bạn đã viết, rồi chọn thao tác. Ngày tháng, số liệu và ý chính được giữ nguyên.</p>
+        <div className="flex items-center gap-3">
+        <ModuleIcon id="bien-tap" className="h-14 w-14 shrink-0" />
+        <div>
+        <h2 className="text-xl font-bold text-slate-800 sm:text-2xl">Biên tập và cải thiện nội dung</h2>
+        <p className="mt-0.5 text-[15px] text-slate-600">Dán nội dung bạn đã viết, rồi chọn thao tác. Ngày tháng, số liệu và ý chính được giữ nguyên.</p>
+        </div>
+        </div>
       </div>
 
       <div className="card space-y-4 p-4 sm:p-6">
@@ -124,6 +131,19 @@ export default function EditorPage({ state, setState, settings, ai, onSaved, onU
           emptyHint="Kết quả biên tập sẽ hiển thị ở đây."
         />
       </div>
+
+      {state.output?.text && (
+        <IllustrationPicker
+          moduleId="bien-tap"
+          data={{}}
+          text={state.output.text}
+          selected={state.illustrationId}
+          onSelect={(id) => {
+            setState((s) => ({ ...s, illustrationId: id }));
+            if (state.historyId) onUpdateHistory(state.historyId, { illustrationId: id });
+          }}
+        />
+      )}
     </div>
   );
 }

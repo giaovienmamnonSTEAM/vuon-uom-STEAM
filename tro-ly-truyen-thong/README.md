@@ -34,6 +34,15 @@ Cập nhật bản trên claude.ai sau khi sửa mã: `npm run build:artifact` (
 
 Khung kết quả có: **Sao chép · Chỉnh sửa · Rút gọn · Phiên bản mới · Tải .txt · In · Xóa nội dung** (xóa luôn hỏi xác nhận).
 
+## 🎨 Hình minh họa
+
+- Bộ hình vẽ SVG cùng một phong cách (hoạt hình 2D, màu pastel) nằm ngay trong mã (`src/illustrations/`): xem được khi không có mạng, không tải ảnh từ bên ngoài.
+- `parts.jsx`: “linh kiện” vẽ dùng chung (cô giáo, bé trai, bé gái, phụ huynh, thỏ, gấu, mèo, sách, bút chì, cầu vồng, trường học…).
+- `scenes.jsx`: 21 cảnh minh họa chia 8 nhóm (Trường học, Cô giáo và trẻ, Gia đình, Sách và học tập, Hoạt động trải nghiệm, Sức khỏe và vệ sinh, Lễ hội và sự kiện, STEAM và khám phá) + hình banner trang chủ.
+- `icons.jsx`: hình cho từng thẻ chức năng và trạng thái (đang soạn, đã xong, lỗi, trống).
+- `suggest.js`: chọn hình gợi ý theo loại nội dung và từ khóa; giáo viên đổi hình, chọn theo chủ đề, lưu PNG/SVG.
+- Ứng dụng **không tạo ảnh bằng AI**: mọi hình đều là hình vẽ sẵn và được ghi rõ như vậy trên giao diện.
+
 ## 🤖 Các chế độ soạn — luôn ghi rõ nguồn
 
 1. **Soạn theo mẫu (không dùng AI)** — mặc định, chạy ngay trên trình duyệt, không cần mạng hay API key. Ghép câu chữ từ mẫu có sẵn và kho kiến thức tuyên truyền; phần biên tập chạy theo quy tắc (khoảng trắng, dấu câu, viết hoa, một số lỗi chính tả thường gặp, cách xưng hô, bố cục). Không viết lại sâu về ý như AI.

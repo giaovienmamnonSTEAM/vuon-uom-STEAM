@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useUI } from '../components/UI.jsx';
 import { EMPTY_SETTINGS } from '../lib/storage.js';
+import { ModuleIcon } from '../illustrations/icons.jsx';
 
 const FIELDS = [
   { name: 'tenTruong', label: 'Tên trường', placeholder: 'VD: Trường Mầm non …' },
@@ -33,7 +34,7 @@ export default function SettingsPage({ settings, onSave, onClear, prefs, onPrefs
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="flex items-center gap-2 text-xl font-bold text-slate-800 sm:text-2xl"><span aria-hidden="true">⚙️</span> Thiết lập thông tin</h2>
+        <h2 className="flex items-center gap-3 text-xl font-bold text-slate-800 sm:text-2xl"><ModuleIcon id="thiet-lap" className="h-14 w-14 shrink-0" /> Thiết lập thông tin</h2>
         <p className="mt-1 text-[15px] text-slate-600">Nhập một lần, các biểu mẫu sẽ tự điền sẵn. Ô nào để trống thì nội dung soạn ra sẽ không có thông tin đó.</p>
       </div>
 

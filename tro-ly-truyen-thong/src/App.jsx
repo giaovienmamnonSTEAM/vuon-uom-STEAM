@@ -10,12 +10,15 @@ import ModulePage from './pages/ModulePage.jsx';
 import EditorPage from './pages/EditorPage.jsx';
 import HistoryPage from './pages/HistoryPage.jsx';
 import SettingsPage from './pages/SettingsPage.jsx';
+import LibraryPage from './pages/LibraryPage.jsx';
+import { HeroArt, BannerDeco } from './illustrations/scenes.jsx';
 
 const NAV = [
   { id: 'trang-chu', label: 'Trang chủ', icon: '🏠' },
   ...MODULES.map((m) => ({ id: m.id, label: m.short, icon: m.icon })),
   { id: 'bien-tap', label: 'Biên tập', icon: '🪄' },
   { id: 'lich-su', label: 'Lịch sử', icon: '🕘' },
+  { id: 'thu-vien-hinh', label: 'Thư viện hình', icon: '🖼️' },
   { id: 'thiet-lap', label: 'Thiết lập thông tin', icon: '⚙️' }
 ];
 const ROUTES = new Set(NAV.map((n) => n.id));
@@ -159,7 +162,7 @@ export default function App() {
     } else {
       const mod = getModule(h.type);
       if (!mod) return toast('Không mở được nội dung này.', 'error');
-      setModuleStates((all) => ({ ...all, [h.type]: { data: { ...initialFormData(mod, {}), ...(h.data || {}) }, output, variant: 0, historyId: h.id } }));
+      setModuleStates((all) => ({ ...all, [h.type]: { data: { ...initialFormData(mod, {}), ...(h.data || {}) }, output, variant: 0, historyId: h.id, illustrationId: h.illustrationId || null } }));
     }
     go(h.type);
     toast('Đã mở lại nội dung. Chỉnh sửa sẽ được lưu vào mục lịch sử này.', 'info');
@@ -216,6 +219,8 @@ export default function App() {
     page = <EditorPage state={editorState} setState={setEditorState} settings={settings} ai={ai} onSaved={addHistory} onUpdateHistory={updateHistory} />;
   } else if (route === 'lich-su') {
     page = <HistoryPage history={history} onOpen={openHistory} onDelete={deleteHistory} onDeleteAll={deleteAllHistory} onUpdate={updateHistory} storageOK={storageOK} storageMode={storageMode} />;
+  } else if (route === 'thu-vien-hinh') {
+    page = <LibraryPage />;
   } else if (route === 'thiet-lap') {
     page = <SettingsPage settings={settings} onSave={saveSettings} onClear={clearSettings} prefs={prefs} onPrefs={updatePrefs} aiStatus={aiStatus} onRecheck={recheck} storageOK={storageOK} storageMode={storageMode} />;
   } else {
@@ -288,11 +293,30 @@ export default function App() {
         </aside>
 
         <main className="min-w-0 flex-1">
-          <header className="mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-sky-200 via-sky-100 to-vang/70 p-5 ring-1 ring-sky-200 sm:p-7 print:hidden">
-            <h1 className="text-2xl font-bold tracking-tight text-sky-900 sm:text-3xl">TRỢ LÝ TRUYỀN THÔNG MẦM NON</h1>
-            <p className="mt-2 text-[15px] text-sky-900/80 sm:text-base">Kết nối nhà trường – giáo viên – gia đình bằng những thông điệp yêu thương</p>
-            <p className="mt-3 text-sm font-medium text-sky-900/70">Người tạo: Trần Thị Quỳ – Trường MN Tam Giang</p>
-          </header>
+          {route === 'trang-chu' ? (
+            <header className="hero-bg relative mb-6 overflow-hidden rounded-3xl ring-1 ring-sky-200 print:hidden">
+              <div className="grid items-center gap-2 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+                <div className="relative z-10 p-5 sm:p-8">
+                  <span className="inline-block rounded-full bg-white/70 px-3 py-1 text-xs font-semibold text-sky-800 ring-1 ring-sky-200">Dành cho giáo viên mầm non</span>
+                  <h1 className="mt-3 text-[26px] font-bold leading-tight tracking-tight text-sky-900 sm:text-4xl" style={{ textWrap: 'balance' }}>TRỢ LÝ TRUYỀN THÔNG MẦM NON</h1>
+                  <p className="mt-3 text-[15px] text-sky-900/80 sm:text-lg">Kết nối nhà trường – giáo viên – gia đình bằng những thông điệp yêu thương</p>
+                  <p className="mt-4 text-sm font-medium text-sky-900/70">Người tạo: Trần Thị Quỳ – Trường MN Tam Giang</p>
+                </div>
+                <div className="art px-4 pb-2 md:px-0 md:pb-0 md:pr-4">
+                  <HeroArt />
+                </div>
+              </div>
+            </header>
+          ) : (
+            <header className="hero-bg relative mb-6 flex items-center justify-between gap-3 overflow-hidden rounded-2xl p-4 ring-1 ring-sky-200 sm:p-5 print:hidden">
+              <div className="min-w-0">
+                <p className="text-lg font-bold tracking-tight text-sky-900 sm:text-xl">TRỢ LÝ TRUYỀN THÔNG MẦM NON</p>
+                <p className="mt-1 text-sm text-sky-900/75">Kết nối nhà trường – giáo viên – gia đình bằng những thông điệp yêu thương</p>
+                <p className="mt-1 text-xs font-medium text-sky-900/60">Người tạo: Trần Thị Quỳ – Trường MN Tam Giang</p>
+              </div>
+              <BannerDeco className="hidden h-16 w-36 shrink-0 sm:block" />
+            </header>
+          )}
           {page}
           <footer className="mt-10 border-t border-sky-100 pt-4 text-center text-xs text-slate-500 print:hidden">
             {storageMode === 'cloud'

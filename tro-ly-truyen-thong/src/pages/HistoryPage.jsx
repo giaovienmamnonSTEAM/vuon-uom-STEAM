@@ -4,6 +4,7 @@ import { HISTORY_TYPES, labelOf } from '../lib/catalog.js';
 import { copyText } from '../lib/exporters.js';
 import { useUI } from '../components/UI.jsx';
 import { removeDiacritics } from '../lib/text.js';
+import { ModuleIcon } from '../illustrations/icons.jsx';
 
 function fmt(ts) {
   try {
@@ -53,7 +54,7 @@ export default function HistoryPage({ history, onOpen, onDelete, onDeleteAll, on
     <div className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="flex items-center gap-2 text-xl font-bold text-slate-800 sm:text-2xl"><span aria-hidden="true">🕘</span> Lịch sử nội dung</h2>
+          <h2 className="flex items-center gap-3 text-xl font-bold text-slate-800 sm:text-2xl"><ModuleIcon id="lich-su" className="h-14 w-14 shrink-0" /> Lịch sử nội dung</h2>
           <p className="mt-1 text-[15px] text-slate-600">Các nội dung đã soạn được tự lưu để xem lại, chỉnh sửa, sao chép.</p>
         </div>
         {history.length > 0 && <button className="btn-danger" onClick={delAll}>🗑️ Xóa tất cả</button>}

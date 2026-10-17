@@ -6,6 +6,8 @@ import { Spinner, useUI } from '../components/UI.jsx';
 import { composeContent, editContent } from '../lib/compose.js';
 import { initialFormData } from '../lib/catalog.js';
 import { findHarshWords } from '../lib/textTools.js';
+import IllustrationPicker from '../components/IllustrationPicker.jsx';
+import { ModuleIcon, OopsArt } from '../illustrations/icons.jsx';
 
 export default function ModulePage({ mod, state, setState, settings, ai, onSaved, onUpdateHistory }) {
   const { toast, confirm } = useUI();
@@ -54,8 +56,9 @@ export default function ModulePage({ mod, state, setState, settings, ai, onSaved
       } else {
         onUpdateHistory(historyId, { text: out.text, source: out.source });
       }
-      setState((s) => ({ ...s, output: out, variant, historyId }));
-      if (kind === 'new') setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+      setState((s) => ({ ...s, output: out, variant, historyId, illustrationId: kind === 'new' ? null : s.illustrationId }));
+      // Khi kết quả nằm dưới biểu mẫu (màn hình hẹp), cuộn tới kết quả
+      if (kind === 'new' && window.innerWidth < 1280) setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
     } catch (e) {
       setAiError(e.message || 'Không soạn được nội dung bằng AI.');
     } finally {
@@ -115,10 +118,13 @@ export default function ModulePage({ mod, state, setState, settings, ai, onSaved
     <div className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="flex items-center gap-2 text-xl font-bold text-slate-800 sm:text-2xl">
-            <span aria-hidden="true">{mod.icon}</span> {mod.title}
-          </h2>
-          <p className="mt-1 text-[15px] text-slate-600">{mod.desc}</p>
+          <div className="flex items-center gap-3">
+            <ModuleIcon id={mod.id} className="h-14 w-14 shrink-0" />
+            <div>
+              <h2 className="text-xl font-bold text-slate-800 sm:text-2xl">{mod.title}</h2>
+              <p className="mt-0.5 text-[15px] text-slate-600">{mod.desc}</p>
+            </div>
+          </div>
         </div>
         <div className="flex gap-2">
           <button className="btn-ghost" onClick={fillSample}>🧪 Điền dữ liệu mẫu</button>
@@ -126,8 +132,10 @@ export default function ModulePage({ mod, state, setState, settings, ai, onSaved
         </div>
       </div>
 
+      {/* Máy tính lớn: trái nhập yêu cầu, phải kết quả. Điện thoại/máy tính bảng: xếp dọc. */}
+      <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-2">
       <form
-        className="card space-y-5 p-4 sm:p-6"
+        className="card min-w-0 space-y-5 p-4 sm:p-6"
         onSubmit={(e) => {
           e.preventDefault();
           run('new');
@@ -147,8 +155,8 @@ export default function ModulePage({ mod, state, setState, settings, ai, onSaved
           <p className="rounded-xl bg-red-50 px-4 py-3 text-[15px] text-red-800 ring-1 ring-red-200" role="alert">⚠️ {error}</p>
         )}
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <button type="submit" className="btn-primary px-6 text-base" disabled={!!busy}>
+        <div className="flex flex-col gap-3">
+          <button type="submit" className="btn-primary self-stretch whitespace-nowrap px-6 text-base sm:self-start" disabled={!!busy}>
             {busy === 'new' ? <Spinner /> : usingAI ? '✨' : '📋'} {usingAI ? 'Tạo nội dung bằng AI' : 'Soạn nội dung theo mẫu'}
           </button>
           <p className="text-sm text-slate-500">
@@ -159,9 +167,11 @@ export default function ModulePage({ mod, state, setState, settings, ai, onSaved
         </div>
       </form>
 
+      <div className="min-w-0 space-y-5">
       {aiError && (
         <div className="card flex flex-col gap-3 p-4 ring-red-200 sm:flex-row sm:items-center sm:justify-between" role="alert">
-          <p className="text-[15px] text-red-800">
+          <OopsArt className="art w-20 shrink-0" />
+          <p className="flex-1 text-[15px] text-red-800">
             ⚠️ {aiError}
             {state.output?.text && <span className="block text-sm text-slate-600">Nội dung trước đó vẫn được giữ nguyên bên dưới.</span>}
           </p>
@@ -184,8 +194,23 @@ export default function ModulePage({ mod, state, setState, settings, ai, onSaved
           onShorten={() => revise('rut-gon')}
           onRewrite={(action, instruction) => revise(action, instruction)}
           usingAI={usingAI}
-          emptyHint="Điền biểu mẫu (hoặc bấm “Điền dữ liệu mẫu”), rồi bấm “Soạn nội dung”."
+          emptyHint={`Điền biểu mẫu (hoặc bấm “Điền dữ liệu mẫu”), rồi bấm “${usingAI ? 'Tạo nội dung bằng AI' : 'Soạn nội dung theo mẫu'}”.`}
         />
+      </div>
+
+      {state.output?.text && (
+        <IllustrationPicker
+          moduleId={mod.id}
+          data={data}
+          text={state.output.text}
+          selected={state.illustrationId}
+          onSelect={(id) => {
+            setState((s) => ({ ...s, illustrationId: id }));
+            if (state.historyId) onUpdateHistory(state.historyId, { illustrationId: id });
+          }}
+        />
+      )}
+      </div>
       </div>
     </div>
   );

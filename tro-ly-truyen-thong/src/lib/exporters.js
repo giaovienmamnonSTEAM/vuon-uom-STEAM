@@ -115,3 +115,47 @@ function printInFrame(text, title) {
     setTimeout(done, 60000);
   }, 50);
 }
+
+// Lưu một tệp bất kỳ (chuỗi hoặc Blob). Trên claude.ai đi qua hộp xác nhận lưu tệp.
+export async function saveFile(name, data, mime = 'application/octet-stream') {
+  if (inClaude()) return saveViaClaude(name, data);
+  const blob = data instanceof Blob ? data : new Blob([data], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  return { ok: true, name };
+}
+
+// Xuất hình minh họa SVG (đang hiển thị trên trang) thành tệp .png hoặc .svg — không cần mạng.
+export async function saveIllustration(svgEl, title, format = 'png') {
+  if (!svgEl) return { ok: false, message: 'Không tìm thấy hình để lưu.' };
+  const clone = svgEl.cloneNode(true);
+  clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  const vb = (clone.getAttribute('viewBox') || '0 0 320 200').split(/\s+/).map(Number);
+  const svgText = new XMLSerializer().serializeToString(clone);
+  if (format === 'svg') return saveFile(fileName(title, 'svg'), svgText, 'image/svg+xml');
+  const scale = 1600 / vb[2];
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.round(vb[2] * scale);
+  canvas.height = Math.round(vb[3] * scale);
+  const img = new Image();
+  const loaded = new Promise((res, rej) => {
+    img.onload = res;
+    img.onerror = rej;
+  });
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgText);
+  try {
+    await loaded;
+  } catch {
+    return { ok: false, message: 'Không chuyển được hình sang PNG. Hãy thử lưu dạng SVG.' };
+  }
+  canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+  const blob = await new Promise((res) => canvas.toBlob(res, 'image/png'));
+  if (!blob) return { ok: false, message: 'Không tạo được tệp PNG.' };
+  return saveFile(fileName(title, 'png'), blob, 'image/png');
+}

@@ -20,3 +20,16 @@
 }
 
 .output-text { font-family: "Be Vietnam Pro", system-ui, sans-serif; white-space: pre-wrap; word-break: break-word; }
+
+/* Hình minh họa: chuyển động nhẹ, tắt khi người dùng chọn giảm chuyển động */
+@keyframes art-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+@keyframes art-twinkle { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@keyframes pop-in { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.art-bob { animation: art-bob 1.6s ease-in-out infinite; transform-box: fill-box; }
+.art-twinkle { animation: art-twinkle 1.4s ease-in-out infinite; }
+.pop-in { animation: pop-in 0.35s ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  .art-bob, .art-twinkle, .pop-in { animation: none; }
+}
+.hero-bg { background: linear-gradient(120deg, #c6e2f6 0%, #e3f0fb 38%, #fff3cf 72%, #fde1d3 100%); }
+.art svg, svg.art { display: block; width: 100%; height: auto; }
