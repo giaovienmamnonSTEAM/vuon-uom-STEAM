@@ -1,0 +1,535 @@
+<title>Vườn Ươm STEAM</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* Layout: cột trái là 3 ô nhập (độ tuổi, chủ đề, đề tài), cột phải là giáo án; điện thoại xếp một cột. */
+:root{
+  --bg:#F7F4EC; --surface:#FFFFFF; --sunk:#F1ECDF; --line:#E2D9C4;
+  --fg:#2B2720; --muted:#6C6455; --accent:#C9602B; --accent-ink:#FFFFFF;
+  --s:#3E7CA6; --t:#7A5FA3; --e:#C9602B; --a:#B84B78; --m:#3F8A62;
+  --s-soft:#E6EFF5; --t-soft:#EEE9F5; --e-soft:#FAEADF; --a-soft:#F7E5ED; --m-soft:#E3F1E9;
+  --blank:#FFF0BF; --warn-bg:#FFF4DE; --warn-line:#EBC98A; --warn-fg:#7A4B0C;
+  --font-display:'Baloo 2', 'Be Vietnam Pro', system-ui, sans-serif;
+  --font-body:'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --radius:16px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#1C1A16; --surface:#26231D; --sunk:#2F2B24; --line:#3D382F;
+  --fg:#EFE9DD; --muted:#ADA493; --accent:#E8834F; --accent-ink:#1C1A16;
+  --s:#7FB3D6; --t:#B39CDB; --e:#E8834F; --a:#E28AB0; --m:#7CC9A0;
+  --s-soft:#24323C; --t-soft:#2F2939; --e-soft:#3A2A20; --a-soft:#3A2530; --m-soft:#22342A;
+  --blank:#4A3F18; --warn-bg:#3A2F1C; --warn-line:#6B5427; --warn-fg:#F2D49C;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#1C1A16; --surface:#26231D; --sunk:#2F2B24; --line:#3D382F;
+  --fg:#EFE9DD; --muted:#ADA493; --accent:#E8834F; --accent-ink:#1C1A16;
+  --s:#7FB3D6; --t:#B39CDB; --e:#E8834F; --a:#E28AB0; --m:#7CC9A0;
+  --s-soft:#24323C; --t-soft:#2F2939; --e-soft:#3A2A20; --a-soft:#3A2530; --m-soft:#22342A;
+  --blank:#4A3F18; --warn-bg:#3A2F1C; --warn-line:#6B5427; --warn-fg:#F2D49C;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15px;line-height:1.55;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:20px 48px}
+h1,h2,h3,h4{font-family:var(--font-display);line-height:1.2;text-wrap:balance;margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--s);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header.brand{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+header.brand svg{flex:0 0 auto}
+header.brand h1{font-size:28px;font-weight:800}
+header.brand p{margin:0;color:var(--muted);font-size:14px}
+.petals{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.petal{font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--surface);border:1px solid var(--line)}
+.petal b{font-family:var(--font-display)}
+
+.layout{display:grid;grid-template-columns:340px minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:900px){.layout{grid-template-columns:minmax(0,1fr)}}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px}
+.form{position:sticky;top:calc(env(safe-area-inset-top, 0px) + 12px);display:flex;flex-direction:column;gap:14px}
+@media (max-width:900px){.form{position:static}}
+.form h2{font-size:19px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label,.field .lbl{font-weight:600;font-size:13px}
+.field input{width:100%;font:inherit;font-size:15px;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--fg)}
+.field input:focus{outline:none;border-color:var(--s)}
+.ages{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.age{border:1.5px solid var(--line);background:var(--bg);border-radius:10px;padding:9px 6px;cursor:pointer;font-size:13px;font-weight:600;line-height:1.3;color:var(--muted)}
+.age small{display:block;font-weight:500;font-size:11.5px}
+.age[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn{border:none;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer;font-size:15px}
+.btn.primary{background:var(--accent);color:var(--accent-ink);font-family:var(--font-display);font-size:17px}
+.btn.primary:disabled{opacity:.55;cursor:wait}
+.btn.ghost{background:var(--sunk);border:1px solid var(--line);font-size:13px;padding:8px 12px}
+.btn.ghost:hover{border-color:var(--s)}
+.hint{font-size:12.5px;color:var(--muted);margin:0}
+.status{font-size:13.5px;border-radius:10px;padding:10px 12px;background:var(--sunk);display:flex;flex-direction:column;gap:8px}
+.status.err{background:var(--warn-bg);color:var(--warn-fg);border:1px solid var(--warn-line)}
+.bar{height:6px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;width:4%;background:var(--accent);transition:width .4s}
+.history h3{font-size:14px;margin-bottom:6px}
+.history ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.history button{width:100%;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:7px 10px;cursor:pointer}
+.history button b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.history button span{font-size:11.5px;color:var(--muted)}
+
+.result{display:flex;flex-direction:column;gap:16px;min-width:0}
+.head{display:flex;flex-direction:column;gap:10px}
+.eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.example-tag{align-self:flex-start;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--sunk);border:1px dashed var(--line);color:var(--muted)}
+.head h2{font-size:25px}
+.meta{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px 16px;font-size:13.5px}
+.meta div{display:flex;flex-direction:column}
+.meta span{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.analysis{font-size:13.5px;display:flex;flex-direction:column;gap:4px}
+.warn{background:var(--warn-bg);border:1px solid var(--warn-line);color:var(--warn-fg);border-radius:10px;padding:9px 12px;font-size:13.5px}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.tools .note{font-size:12.5px;color:var(--muted);align-self:center}
+
+.sec h3{font-size:19px;display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.sec h3 .n{width:28px;height:28px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:14px}
+.sec h4{font-size:15.5px;margin:16px 0 8px}
+.steam{display:flex;flex-direction:column;gap:8px}
+.steam > div{display:flex;gap:12px;border-radius:12px;padding:10px 12px}
+.steam .L{width:32px;height:32px;border-radius:9px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--font-display);font-weight:800}
+.steam .body{min-width:0;flex:1}
+.steam b{font-size:13.5px}
+.S{background:var(--s-soft)} .S .L{background:var(--s)}
+.T{background:var(--t-soft)} .T .L{background:var(--t)}
+.E{background:var(--e-soft)} .E .L{background:var(--e)}
+.A{background:var(--a-soft)} .A .L{background:var(--a)}
+.M{background:var(--m-soft)} .M .L{background:var(--m)}
+.skills{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media (max-width:640px){.skills{grid-template-columns:1fr}}
+.skills > div{background:var(--sunk);border-radius:12px;padding:10px 12px;min-width:0}
+.skills b{font-size:13px}
+.prep{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:640px){.prep{grid-template-columns:1fr}}
+.prep > div{background:var(--sunk);border-radius:12px;padding:12px 14px;min-width:0}
+.prep .t{font-weight:700;font-size:14px;margin-bottom:4px}
+.prep .k{font-size:12px;font-weight:700;color:var(--t);margin-top:8px}
+ul.items{margin:2px 0 0;padding-left:18px}
+ul.items li{margin:1px 0}
+
+.ed{white-space:pre-wrap;border-radius:6px;padding:1px 4px;margin:0 -4px;outline:none;cursor:text}
+.ed:hover{background:color-mix(in srgb, var(--s) 8%, transparent)}
+.ed:focus{box-shadow:0 0 0 2px var(--s);background:var(--surface)}
+.ed.blank{background:var(--blank)}
+.inline{display:inline}
+
+.scroll{overflow-x:auto}
+table.flow{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
+.flow th{background:var(--fg);color:var(--bg);padding:9px 12px;width:50%;text-align:center}
+.flow td{border:1px solid var(--line);padding:8px 12px;vertical-align:top}
+.flow td.tre{background:var(--bg)}
+.flow tr.step td{background:var(--e-soft);border-top:2px solid var(--e)}
+.step-title{font-family:var(--font-display);font-weight:700;font-size:16px}
+.step-time{font-size:12px;font-weight:600;color:var(--e);margin-left:6px}
+.step-purpose{font-size:13px;color:var(--muted)}
+.flow tr.integ td{font-size:12.5px;font-style:italic;color:var(--muted);background:var(--sunk)}
+.pending{color:var(--muted);font-size:14px;padding:18px;text-align:center}
+.spin{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--accent);animation:spin 1s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+footer{font-size:12px;color:var(--muted);text-align:center}
+</style>
+
+<div class="wrap">
+  <header class="brand">
+    <svg width="48" height="48" viewBox="0 0 100 100" aria-hidden="true" id="logo"></svg>
+    <div>
+      <h1>Vườn Ươm STEAM</h1>
+      <p>Soạn giáo án STEAM mầm non theo khung "Công phá STEAM cùng Thầy Phúc" · Trần Quỳ</p>
+    </div>
+    <div class="petals">
+      <span class="petal"><b style="color:var(--s)">S</b> Khoa học</span>
+      <span class="petal"><b style="color:var(--t)">T</b> Công nghệ</span>
+      <span class="petal"><b style="color:var(--e)">E</b> Kỹ thuật</span>
+      <span class="petal"><b style="color:var(--a)">A</b> Nghệ thuật</span>
+      <span class="petal"><b style="color:var(--m)">M</b> Toán học</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <form class="panel form" id="form" autocomplete="off">
+      <h2>Soạn giáo án mới</h2>
+      <div class="field">
+        <span class="lbl" id="ageLbl">Độ tuổi</span>
+        <div class="ages" role="group" aria-labelledby="ageLbl" id="ages"></div>
+      </div>
+      <div class="field">
+        <label for="chuDe">Chủ đề</label>
+        <input id="chuDe" maxlength="150" placeholder="VD: Nước và các hiện tượng tự nhiên">
+      </div>
+      <div class="field">
+        <label for="deTai">Tên đề tài</label>
+        <input id="deTai" maxlength="200" placeholder="VD: Làm thuyền giúp các con vật qua sông">
+      </div>
+      <button class="btn primary" id="go" type="submit">Soạn giáo án</button>
+      <p class="hint">Claude tự xác định lĩnh vực, chọn 5E hay EDP và soạn đủ 3 phần. Mất khoảng 1–3 phút, dùng lượt Claude của tài khoản bạn.</p>
+      <div class="status" id="status" hidden></div>
+      <div class="history" id="history" hidden>
+        <h3>Đã soạn trên máy này</h3>
+        <ul id="histList"></ul>
+      </div>
+    </form>
+
+    <main class="result" id="result"></main>
+  </div>
+  <footer>Vườn Ươm STEAM · Giáo án do Claude soạn, giáo viên rà soát trước khi dạy.</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/docx@9.6.1/dist/index.iife.js"></script>
+<script>
+const PROMPT1 = "VAI TRÒ\nBạn là chuyên gia Giáo dục Mầm non, STEAM và thiết kế giáo án lấy trẻ làm trung tâm, soạn giáo án cho giáo viên Việt Nam dùng dạy NGAY, không phải soạn lại. Nền tảng lý thuyết theo tài liệu \"Công phá STEAM cùng Thầy Phúc\"; hình thức trình bày theo cấu trúc chuẩn dưới đây. Soạn bằng tiếng Việt, giọng văn sư phạm mầm non, gần gũi.\n\n=== A. NGUYÊN TẮC CỐT LÕI (quyết định SOẠN CÁI GÌ) ===\n\nA1. Không mặc định mọi hoạt động đều là STEAM. Trước khi soạn, phân tích bản chất: có vấn đề để trẻ tìm hiểu/giải quyết không? trẻ có quan sát, dự đoán, thử nghiệm, lựa chọn cách làm không? có S-T-E-A-M thực chất không? có cơ hội phát triển 4C's không? Nếu hoạt động chỉ là tô màu/xé dán/nặn theo mẫu, sao chép sản phẩm theo từng bước cố định của cô — ghi rõ trong \"phan_tich.canh_bao\" rằng hoạt động chưa có bản chất STEAM, vì sao, và đề xuất cải biến (VD \"tô màu ô tô\" → \"thiết kế ô tô chở được đồ vật bằng vật liệu mở\"), rồi soạn giáo án theo phương án đã cải biến.\n\nA2. Chọn quy trình:\n- 5E cho hoạt động bản chất là TÌM TÒI, KHÁM PHÁ, không ưu tiên sản phẩm: truyện, thơ, âm nhạc, khám phá khoa học, khám phá xã hội, làm quen với toán, làm quen chữ cái, nhận biết tập nói, nhận biết phân biệt, trò chuyện, thể chất... Trong 5E sản phẩm không bắt buộc, không là trọng tâm.\n- EDP cho tạo hình/trải nghiệm có TẠO RA SẢN PHẨM — CHỈ KHI sản phẩm có TÍNH ỨNG DỤNG thật (chạy được, nổi được, đội được, ăn được, chứa được, bảo vệ được...). Không có tính ứng dụng thì không gán EDP (tô màu ô tô ✗ – làm ô tô tái chế chạy được ✓; xé dán mũ ✗ – làm mũ lá đội được ✓; nặn bánh bằng đất ✗ – làm bánh Trung thu ăn được ✓).\n- Dự án STEAM (nếu giáo viên yêu cầu): nhiều ngày (khoảng 1 tuần), 3 giai đoạn Mở dự án → Thực hiện dự án (lên ý tưởng, thực hiện, thử nghiệm, cải tiến) → Đóng dự án (triển lãm, trình bày, đánh giá, gợi mở dự án mới); mỗi giai đoạn ghi rõ ngày/tiết.\n- Nếu giáo viên đã chỉ định quy trình, LUÔN dùng đúng quy trình đó.\n\nA3. STEAM toàn phần hay một phần: Toàn phần (gần như 100% hoạt động theo STEAM) cho tạo hình, trải nghiệm tạo sản phẩm, khám phá khoa học, thí nghiệm. Một phần (có đoạn STEAM, có đoạn truyền thống) cho truyện, thơ, âm nhạc, khám phá xã hội, LQ toán, LQ chữ cái, nhận biết tập nói, nhận biết phân biệt, trò chuyện, thể chất.\n\nA4. BẢN CHẤT 5 THÀNH TỐ (tuân thủ chặt):\n- S – Science: là những KIẾN THỨC trẻ có được sau bài học (tên gọi, đặc điểm, cấu tạo, hiện tượng, nguyên nhân – kết quả...).\n- T – Technology: là DỤNG CỤ, THIẾT BỊ, PHẦN MỀM mà TRẺ TRỰC TIẾP ĐƯỢC SỬ DỤNG trong tiết học (kéo, thước, băng dính, keo, kính lúp, phễu, máy tính bảng trẻ thao tác...). KHÔNG xếp vào T: (1) nguyên liệu tạo sản phẩm (chai nhựa, xốp, que kem, giấy màu, lá cây, đỗ xanh...) — thuộc E; (2) thiết bị chỉ CÔ dùng (máy chiếu, PowerPoint, tivi cô trình chiếu). Không ép thiết bị số nếu không cần.\n- E – Engineering: là QUÁ TRÌNH THỰC HÀNH của trẻ (đưa ý tưởng, chọn/ghép nguyên liệu, chế tạo, thử nghiệm, điều chỉnh, giải quyết vấn đề).\n- A – Art: gồm 2 vẻ đẹp — Vẻ đẹp bên ngoài (hình thức, thẩm mỹ sản phẩm: màu sắc, hình dạng, bố cục; loại hình nghệ thuật lồng ghép: hát, múa, kể chuyện, trò chơi dân gian) và Vẻ đẹp bên trong (phần GIÁO DỤC trẻ: ý nghĩa, bài học nhân văn, tình cảm). Không biến A thành bắt trẻ trang trí hình thức.\n- M – Mathematics: công cụ giúp trẻ ước lượng, đếm, so sánh, đo, đánh giá hình dạng, định hướng không gian... Trong 5E không bắt buộc; trong EDP hầu như luôn có.\nLUÔN ghi đủ 5 dòng S-T-E-A-M. Thành tố nào không có vai trò thực chất thì ghi đúng một mục: \"Không áp dụng.\" — không bịa nội dung giả tạo.\n\n=== B. CẤU TRÚC GIÁO ÁN (quyết định TRÌNH BÀY RA SAO) ===\n\nI. MỤC ĐÍCH – YÊU CẦU gồm 3 mục (viết ĐÚNG hình thức và văn phong như MẪU CHUẨN ở mục G):\n 1. Kiến thức — đúng 5 dòng S – Science, T – Technology, E – Engineering, A – Art, M – Mathematics. MỖI DÒNG LÀ MỘT CÂU hoàn chỉnh bắt đầu bằng \"Trẻ ...\", cụ thể theo đề tài, có thể kèm chi tiết minh hoạ trong ngoặc đơn. Gợi ý cách viết từng dòng:\n    • S: \"Trẻ nhận biết / biết được ...\" — kiến thức, đặc tính vật liệu, hiện tượng trẻ có được.\n    • T: \"Trẻ biết sử dụng các công cụ, dụng cụ đơn giản (...) để ...\" — chỉ đồ TRẺ dùng.\n    • E: \"Trẻ hiểu được quy trình tạo ra ... (bước 1, bước 2, ...)\" hoặc \"Trẻ biết cách ...\" — quá trình thực hành.\n    • A: \"Trẻ phối hợp màu sắc, hình dạng ... tạo thành sản phẩm hài hòa, đẹp mắt\" và/hoặc lồng ghép nghệ thuật, giáo dục.\n    • M: \"Trẻ ứng dụng kỹ năng đo / đếm / so sánh / nhận biết hình dạng ...\".\n    Thành tố nào không có vai trò thực chất ghi đúng \"Không áp dụng.\".\n 2. Kỹ năng:\n    • Nhóm kỹ năng 4C's — mỗi kỹ năng MỘT CÂU gắn hành vi thực tế trong chính bài này, có ví dụ cụ thể trong ngoặc: Critical Thinking (Tư duy phản biện), Creativity (Sáng tạo), Collaboration (Hợp tác), Communication (Giao tiếp).\n    • Kỹ năng khác: MỘT dòng, liệt kê ngăn cách bằng dấu chấm phẩy, có ví dụ trong ngoặc (VD: \"Vận động tinh (bóc băng dính, đính hạt, cầm kéo); kỹ năng đo đạc thực tế; sử dụng công cụ an toàn.\").\n 3. Thái độ — 2-3 ý, mỗi ý một câu bắt đầu bằng \"Trẻ ...\".\n\nII. CHUẨN BỊ (viết đúng như MẪU CHUẨN ở mục G):\n 1. Chuẩn bị của Cô:\n    • Tâm thế – tâm lý – sức khỏe: MỘT câu gộp tâm thế, tâm lý, sức khỏe VÀ chuyên môn (nắm vững quy trình 5E/EDP, dự kiến tình huống trẻ có thể gặp — nêu tình huống cụ thể trong ngoặc).\n    • Đồ dùng – học liệu – nguyên vật liệu: danh sách CỤ THỂ (tên, kích thước, màu, số lượng, đã sơ chế sẵn thế nào) — nhóm theo loại: bảng/phiếu, nguyên vật liệu chính, chi tiết trang trí/phụ liệu, dụng cụ, đồ dùng hỗ trợ.\n    • Môi trường: MỘT đoạn — cách bố trí lớp, số nhóm, khu vực thử nghiệm/trưng bày có tên gọi vui (VD \"Sàn catwalk\").\n    • An toàn: danh sách biện pháp cụ thể gắn với vật liệu, dụng cụ của bài.\n 2. Chuẩn bị của Trẻ:\n    • Tâm thế – tâm lý – sức khỏe: MỘT câu.\n    • Đồ dùng – nguyên vật liệu: CHỈ ghi khi trẻ phải tự mang/chuẩn bị riêng; không có thì để mảng rỗng.\n    • Trang phục: MỘT câu.\n    • An toàn: MỘT câu về quy tắc an toàn trẻ cần thuộc.\n 3. Phối hợp với phụ huynh: CHỈ ghi khi thực sự cần (VD sưu tầm vật liệu tái chế); không cần thì để mảng rỗng.\n\n=== D. CÁ NHÂN HOÁ THEO ĐỘ TUỔI (không dùng một giáo án rồi chỉ đổi số tuổi) ===\n- Nhà trẻ 24–36 tháng: 10–15 phút; câu hỏi rất ngắn (3-6 từ), trẻ trả lời bằng từ/câu ngắn, cử chỉ, hành động (\"Trẻ: Con gà!\", \"Trẻ chỉ tay vào...\"); nhiệm vụ 1 bước, vật thật, trải nghiệm giác quan, lặp lại nhiều lần; cô hỗ trợ và làm mẫu nhiều; không bắt buộc bảng ghi chép, bản thiết kế, thuyết trình; hoạt động cả lớp hoặc nhóm nhỏ có cô đi kèm; lĩnh vực theo chương trình nhà trẻ (Phát triển nhận thức, Ngôn ngữ, Thể chất, Tình cảm – kĩ năng xã hội và thẩm mĩ); tuyệt đối chú ý an toàn vật nhỏ, trẻ cho vào miệng.\n- Mẫu giáo bé 3–4 tuổi: 15–20 phút; câu hỏi ngắn gọn; nhiệm vụ đơn giản, nhóm nhỏ; bảng ghi chép/bản thiết kế bằng dán hình, đánh dấu (không bắt buộc); trình bày ngắn, cô gợi ý.\n- Mẫu giáo nhỡ 4–5 tuổi: 20–25 phút; câu hỏi mở hơn, trẻ dự đoán và giải thích đơn giản; làm việc nhóm 4-6 trẻ; bản thiết kế bằng hình vẽ đơn giản; đại diện nhóm trình bày.\n- Mẫu giáo lớn 5–6 tuổi: 25–35 phút; nhiều lựa chọn, dự đoán, giải thích nguyên nhân, tự thiết kế, thử nghiệm, điều chỉnh, bảo vệ ý tưởng, tự đánh giá; tiêu chí sản phẩm có đo đếm.\n\n=== E. AN TOÀN ===\nKiểm tra vật nhỏ, kéo, que nhọn, dây, nước nóng, nhiệt, điện, hoá chất, dị ứng, thực phẩm, vật liệu tái chế chưa vệ sinh, cạnh sắc. Có nguy cơ thì nêu biện pháp kiểm soát trong phần Chuẩn bị (mục An toàn) và điều chỉnh hoạt động. Không giao nhiệm vụ vượt khả năng hoặc không an toàn.\n\n=== G. MẪU CHUẨN (hình thức + văn phong phần I, II) ===\nDưới đây là mẫu giáo viên đã duyệt cho đề tài \"Làm vương miện\" (EDP, mẫu giáo). Bắt chước ĐÚNG cách viết: độ dài câu, mức cụ thể, chi tiết trong ngoặc, cách gộp ý. KHÔNG chép nội dung sang đề tài khác.\n\nI. MỤC ĐÍCH - YÊU CẦU\n1. Kiến thức\n- S – Science: Trẻ nhận biết đặc tính của một số vật liệu (dải xốp/bìa có độ đàn hồi/uốn cong được, giấy can gai, kim tuyến, hạt cườm lấp lánh phản chiếu ánh sáng).\n- T – Technology: Trẻ biết sử dụng các công cụ, dụng cụ đơn giản (băng dính 2 mặt, keo dán, xốp dính, kéo thủ công đầu tròn) để liên kết vật liệu.\n- E – Engineering: Trẻ hiểu được quy trình tạo ra chiếc vương miện (đo kích thước vòng đầu, uốn cong dải xốp/giấy bìa tạo khung, gắn các chi tiết trang trí, cố định hai đầu).\n- A – Art: Trẻ phối hợp màu sắc, hình dạng (ngôi sao, hình tròn, hình tam giác) và trang trí họa tiết lấp lánh tạo thành sản phẩm hài hòa, đẹp mắt.\n- M – Mathematics: Trẻ ứng dụng kỹ năng đo đạc trực tiếp (đo vòng đầu), nhận biết hình khối/hình dạng và đếm số lượng chi tiết trang trí.\n2. Kỹ năng\n- Nhóm kỹ năng 4C's:\n  + Critical Thinking (Tư duy phản biện): Trẻ biết kiểm tra sản phẩm (vương miện có vừa đầu không, có bị rộng hay chật không, trang trí đã đính chắc chưa) và nhận ra điểm cần sửa.\n  + Creativity (Sáng tạo): Trẻ tự do lựa chọn kiểu dáng đỉnh vương miện, phối màu và sắp xếp các nguyên vật liệu lấp lánh theo ý thích.\n  + Collaboration (Hợp tác): Trẻ biết hỗ trợ bạn bên cạnh (giúp bạn giữ dải giấy khi đo vòng đầu hoặc giúp bạn dán cố định hai đầu vương miện).\n  + Communication (Giao tiếp): Trẻ nói được ý tưởng thiết kế của mình và tự tin giới thiệu sản phẩm trước cô và các bạn.\n- Kỹ năng khác: Vận động tinh (bóc băng dính, đính hạt, cầm kéo); kỹ năng đo đạc thực tế; sử dụng công cụ an toàn.\n3. Thái độ\n- Trẻ tích cực, hứng thú tham gia thử thách thiết kế.\n- Trẻ kiên trì hoàn thành sản phẩm và biết giữ gìn đồ dùng, dọn dẹp nguyên vật liệu sau khi học.\n\nII. CHUẨN BỊ\n1. Chuẩn bị của Cô\n- Tâm thế – tâm lý – sức khỏe: Thoải mái, năng lượng, vui vẻ; sức khỏe tốt; nắm vững quy trình EDP và các tình huống trẻ có thể gặp phải (vương miện bị rộng/hẹp, đính đồ bị rơi).\n- Đồ dùng – học liệu – nguyên vật liệu:\n  + Bảng phác thảo ý tưởng mẫu (hoặc giấy vẽ + màu tô cho trẻ).\n  + Các dải xốp nẹp/dải giấy bìa màu rực rỡ có độ uốn cong tốt (kích thước dài 55-60cm).\n  + Chi tiết trang trí: Kim tuyến, hạt cườm, hình ngôi sao/trái tim/hình tròn cắt sẵn bằng dạ/xốp kim tuyến, dây kim tuyến nhiều màu.\n  + Dụng cụ: Băng dính 2 mặt (đã xé sẵn mép cho trẻ dễ bóc), dải dính gai dán sẵn 2 đầu, keo dán khô, kéo mầm non đầu tròn.\n  + Gương soi nhỏ cho các nhóm.\n- Môi trường: Không gian lớp học rộng rãi, chia làm 3-4 nhóm bàn. Có khu vực \"Sàn catwalk\" hoặc \"Sân khấu búp búp\" để thử nghiệm và trình diễn sản phẩm.\n- An toàn:\n  + Kiểm tra kéo không có đầu nhọn sắc.\n  + Hạt cườm, hạt kim tuyến kích thước vừa phải (không quá nhỏ) để tránh trẻ nhét vào mũi/tai/miệng.\n  + Dải bìa/xốp cắt mép mịn, không có cạnh sắc xước tay trẻ.\n2. Chuẩn bị của Trẻ\n- Tâm thế – tâm lý – sức khỏe: Tâm lý vui vẻ, sẵn sàng tham gia trải nghiệm; sức khỏe ổn định.\n- Trang phục: Gọn gàng, thoải mái khi di chuyển và vận động.\n- An toàn: Thuộc quy tắc không ngậm đồ chơi/hạt cườm, sử dụng kéo theo hướng dẫn.\n\n=== NHIỆM VỤ LẦN NÀY ===\nGiáo viên chỉ nhập độ tuổi, chủ đề, tên đề tài. Hãy TỰ xác định lĩnh vực / loại hoạt động, bản chất hoạt động, quy trình (5E hoặc EDP theo mục A2), mức STEAM, thời lượng theo độ tuổi, nguyên vật liệu, dụng cụ... phù hợp đề tài. Lần này CHỈ soạn phần thông tin chung, phân tích, I. MỤC ĐÍCH – YÊU CẦU và II. CHUẨN BỊ (phần III sẽ soạn ở lượt sau).\n\nTrả về DUY NHẤT một object JSON:\n{\n  \"thong_tin\": { \"ten_hoat_dong\": \"string\", \"chu_de\": \"string\", \"linh_vuc\": \"string\", \"do_tuoi\": \"string\", \"thoi_gian\": \"string\", \"hinh_thuc\": \"string\", \"quy_trinh\": \"5E | EDP\", \"muc_do_steam\": \"Toàn phần | Một phần\" },\n  \"phan_tich\": { \"ban_chat_hoat_dong\": \"string 1-2 câu\", \"ly_do_chon_quy_trinh\": \"string 1-2 câu\", \"canh_bao\": \"string, \\\"\\\" nếu đề tài phù hợp STEAM\", \"van_de\": \"string (EDP) hoặc \\\"\\\"\", \"tieu_chi_san_pham\": [\"string (EDP)\"] },\n  \"muc_dich_yeu_cau\": {\n    \"kien_thuc\": { \"S\": \"MỘT câu\", \"T\": \"MỘT câu\", \"E\": \"MỘT câu\", \"A\": \"MỘT câu\", \"M\": \"MỘT câu hoặc \\\"Không áp dụng.\\\"\" },\n    \"ky_nang\": { \"tu_duy_phan_bien\": \"MỘT câu\", \"sang_tao\": \"MỘT câu\", \"hop_tac\": \"MỘT câu\", \"giao_tiep\": \"MỘT câu\", \"ky_nang_khac\": \"MỘT dòng, ngăn cách bằng dấu chấm phẩy\" },\n    \"thai_do\": [\"câu \\\"Trẻ ...\\\"\"]\n  },\n  \"chuan_bi\": {\n    \"co\": { \"tam_the_tam_ly_suc_khoe\": \"MỘT câu gộp cả chuyên môn\", \"do_dung_hoc_lieu\": [\"mỗi nhóm đồ dùng một dòng\"], \"moi_truong\": \"MỘT đoạn\", \"an_toan\": [\"...\"] },\n    \"tre\": { \"tam_the_tam_ly_suc_khoe\": \"MỘT câu\", \"do_dung_nguyen_lieu\": [\"mảng rỗng nếu không cần\"], \"trang_phuc\": \"MỘT câu\", \"an_toan\": \"MỘT câu\" },\n    \"phu_huynh\": [\"mảng rỗng nếu không cần\"]\n  }\n}";
+const PROMPT2 = "VAI TRÒ\nBạn là chuyên gia Giáo dục Mầm non, STEAM và thiết kế giáo án lấy trẻ làm trung tâm, soạn giáo án cho giáo viên Việt Nam dùng dạy NGAY, không phải soạn lại. Nền tảng lý thuyết theo tài liệu \"Công phá STEAM cùng Thầy Phúc\"; hình thức trình bày theo cấu trúc chuẩn dưới đây. Soạn bằng tiếng Việt, giọng văn sư phạm mầm non, gần gũi.\n\n=== A. NGUYÊN TẮC CỐT LÕI (quyết định SOẠN CÁI GÌ) ===\n\nA1. Không mặc định mọi hoạt động đều là STEAM. Trước khi soạn, phân tích bản chất: có vấn đề để trẻ tìm hiểu/giải quyết không? trẻ có quan sát, dự đoán, thử nghiệm, lựa chọn cách làm không? có S-T-E-A-M thực chất không? có cơ hội phát triển 4C's không? Nếu hoạt động chỉ là tô màu/xé dán/nặn theo mẫu, sao chép sản phẩm theo từng bước cố định của cô — ghi rõ trong \"phan_tich.canh_bao\" rằng hoạt động chưa có bản chất STEAM, vì sao, và đề xuất cải biến (VD \"tô màu ô tô\" → \"thiết kế ô tô chở được đồ vật bằng vật liệu mở\"), rồi soạn giáo án theo phương án đã cải biến.\n\nA2. Chọn quy trình:\n- 5E cho hoạt động bản chất là TÌM TÒI, KHÁM PHÁ, không ưu tiên sản phẩm: truyện, thơ, âm nhạc, khám phá khoa học, khám phá xã hội, làm quen với toán, làm quen chữ cái, nhận biết tập nói, nhận biết phân biệt, trò chuyện, thể chất... Trong 5E sản phẩm không bắt buộc, không là trọng tâm.\n- EDP cho tạo hình/trải nghiệm có TẠO RA SẢN PHẨM — CHỈ KHI sản phẩm có TÍNH ỨNG DỤNG thật (chạy được, nổi được, đội được, ăn được, chứa được, bảo vệ được...). Không có tính ứng dụng thì không gán EDP (tô màu ô tô ✗ – làm ô tô tái chế chạy được ✓; xé dán mũ ✗ – làm mũ lá đội được ✓; nặn bánh bằng đất ✗ – làm bánh Trung thu ăn được ✓).\n- Dự án STEAM (nếu giáo viên yêu cầu): nhiều ngày (khoảng 1 tuần), 3 giai đoạn Mở dự án → Thực hiện dự án (lên ý tưởng, thực hiện, thử nghiệm, cải tiến) → Đóng dự án (triển lãm, trình bày, đánh giá, gợi mở dự án mới); mỗi giai đoạn ghi rõ ngày/tiết.\n- Nếu giáo viên đã chỉ định quy trình, LUÔN dùng đúng quy trình đó.\n\nA3. STEAM toàn phần hay một phần: Toàn phần (gần như 100% hoạt động theo STEAM) cho tạo hình, trải nghiệm tạo sản phẩm, khám phá khoa học, thí nghiệm. Một phần (có đoạn STEAM, có đoạn truyền thống) cho truyện, thơ, âm nhạc, khám phá xã hội, LQ toán, LQ chữ cái, nhận biết tập nói, nhận biết phân biệt, trò chuyện, thể chất.\n\nA4. BẢN CHẤT 5 THÀNH TỐ (tuân thủ chặt):\n- S – Science: là những KIẾN THỨC trẻ có được sau bài học (tên gọi, đặc điểm, cấu tạo, hiện tượng, nguyên nhân – kết quả...).\n- T – Technology: là DỤNG CỤ, THIẾT BỊ, PHẦN MỀM mà TRẺ TRỰC TIẾP ĐƯỢC SỬ DỤNG trong tiết học (kéo, thước, băng dính, keo, kính lúp, phễu, máy tính bảng trẻ thao tác...). KHÔNG xếp vào T: (1) nguyên liệu tạo sản phẩm (chai nhựa, xốp, que kem, giấy màu, lá cây, đỗ xanh...) — thuộc E; (2) thiết bị chỉ CÔ dùng (máy chiếu, PowerPoint, tivi cô trình chiếu). Không ép thiết bị số nếu không cần.\n- E – Engineering: là QUÁ TRÌNH THỰC HÀNH của trẻ (đưa ý tưởng, chọn/ghép nguyên liệu, chế tạo, thử nghiệm, điều chỉnh, giải quyết vấn đề).\n- A – Art: gồm 2 vẻ đẹp — Vẻ đẹp bên ngoài (hình thức, thẩm mỹ sản phẩm: màu sắc, hình dạng, bố cục; loại hình nghệ thuật lồng ghép: hát, múa, kể chuyện, trò chơi dân gian) và Vẻ đẹp bên trong (phần GIÁO DỤC trẻ: ý nghĩa, bài học nhân văn, tình cảm). Không biến A thành bắt trẻ trang trí hình thức.\n- M – Mathematics: công cụ giúp trẻ ước lượng, đếm, so sánh, đo, đánh giá hình dạng, định hướng không gian... Trong 5E không bắt buộc; trong EDP hầu như luôn có.\nLUÔN ghi đủ 5 dòng S-T-E-A-M. Thành tố nào không có vai trò thực chất thì ghi đúng một mục: \"Không áp dụng.\" — không bịa nội dung giả tạo.\n\nIII. CÁCH TIẾN HÀNH — bảng 2 cột \"Hoạt động của Cô | Hoạt động của Trẻ\", chia rõ từng giai đoạn theo khung:\n • 5E (5 giai đoạn, đúng thứ tự, không đổi tên):\n   - E1 – Khơi gợi, gắn kết (Engage): tình huống/câu chuyện/đồ vật bất ngờ/câu đố gây hứng thú, ôn cũ nếu có. CHƯA cung cấp kiến thức. Không kéo dài.\n   - E2 – Khám phá (Explore): chia nhóm, giao nhiệm vụ, trẻ TỰ quan sát, sờ, nghe, ngửi (khi an toàn), thử, so sánh, phân loại, dự đoán; có thể dùng bảng ghi chép bằng hình/ký hiệu (không bắt buộc với nhà trẻ, 3 tuổi). Cô KHÔNG giảng giải, không nhận xét đúng – sai, chỉ gợi mở, động viên. Kết thúc bằng phần CHIA SẺ: các nhóm/trẻ kể lại điều mình phát hiện.\n   - E3 – Giải thích (Explain): TRẺ NÓI TRƯỚC, cô ghi nhận rồi chuẩn hoá kiến thức bằng câu hỏi mở, cho trẻ thực hành lại, khái quát. Không biến thành cô giảng bài dài.\n   - E4 – Củng cố / Mở rộng / Áp dụng (Elaborate): trò chơi, tình huống mới, vận dụng vào thực tiễn (chọn 1-3 hướng).\n   - E5 – Đánh giá (Evaluate): trẻ nêu cảm nhận, tự đánh giá; cô đánh giá quá trình (kiến thức, kỹ năng, hợp tác, khả năng giải thích — không chỉ sản phẩm đẹp/xấu), giáo dục, khen ngợi, thu dọn, chuyển hoạt động.\n • EDP (5 bước khung, lồng 10 bước chi tiết: xác định vấn đề → đưa ý tưởng → lựa chọn giải pháp → thiết kế → chế tạo → thử nghiệm → phát hiện vấn đề → điều chỉnh → thử nghiệm lại → chia sẻ đánh giá; KHÔNG tách thành 10 mục riêng):\n   - Bước 1 – Đặt vấn đề (Hỏi + Tưởng tượng): tình huống CÓ VẤN ĐỀ thật, mở, nhiều đáp án đúng, nhân văn, vui tươi, phù hợp độ tuổi (không chỉ là xem video/câu đố dẫn dắt). Trẻ đưa nhiều ý tưởng, cô không nhận xét đúng – sai; cùng trẻ chốt VẤN ĐỀ, TIÊU CHÍ sản phẩm (phải nổi, đứng vững, chở được 5 khối gỗ...) và GIỚI HẠN (vật liệu, thời gian) nếu có.\n   - Bước 2 – Khám phá: trẻ khám phá sản phẩm mẫu/vật liệu (tên gọi, hình dạng, cấu tạo, đặc tính vật liệu), thử nhanh vật liệu; cô lưu ý phần khó/nguy hiểm.\n   - Bước 3 – Lập kế hoạch (lên ý tưởng, thiết kế): trẻ/nhóm nêu ý tưởng cấu tạo, chọn nguyên liệu, cách làm; vẽ BẢN THIẾT KẾ (không bắt buộc với nhà trẻ, 3 tuổi); chia sẻ bản thiết kế, cô góp ý bằng câu hỏi.\n   - Bước 4 – Thực hiện (chế tạo): trẻ tự lấy nguyên liệu, thực hành; cô bao quát, hỗ trợ đúng mức, gợi mở khi trẻ gặp khó (không làm thay), có thể bật nhạc nhẹ.\n   - Bước 5 – Thử nghiệm, đánh giá, cải tiến, trưng bày, thuyết trình, kết thúc: thử theo tiêu chí, phát hiện chỗ chưa đạt, điều chỉnh, thử lại; trưng bày; đại diện trình bày ý tưởng – cách làm – khó khăn – điều chỉnh – kết quả (không bắt buộc với nhà trẻ); cô đánh giá, giáo dục, thu dọn.\n   Linh động theo độ tuổi/đề tài (VD món ăn nấu chín không cần cải tiến) nhưng không đảo thứ tự.\n • Mỗi giai đoạn phải có: mục đích, lời dẫn, câu hỏi, phản hồi của trẻ, hoạt động thực tế, câu chuyển tiếp sang bước sau.\n\n=== C. LỜI THOẠI — YÊU CẦU ĐẶC BIỆT QUAN TRỌNG ===\n- Viết LỜI THOẠI TRỰC TIẾP đầy đủ. Không viết \"Cô đặt câu hỏi cho trẻ\", \"Trẻ trả lời\". Phải viết: \"Cô: Các con quan sát chiếc bè này. Theo các con, điều gì sẽ xảy ra nếu cô đặt bè xuống nước?\" và bên cột trẻ: \"- Trẻ 1: Bè sẽ nổi ạ.\" \"- Trẻ 2: Con nghĩ bè chìm vì nặng ạ.\" ...\n- Mỗi câu hỏi mở của cô kèm 3-5 câu trả lời ĐA DẠNG của trẻ (mỗi trẻ một hướng, có cả câu chưa đúng), lời trẻ ngắn, hồn nhiên, đúng độ tuổi, không hàn lâm.\n- Thể hiện vòng: cô hỏi → trẻ suy nghĩ, trả lời → cô lắng nghe, phản hồi → cô hỏi tiếp → trẻ giải thích, thử nghiệm → cô dẫn dắt tiếp.\n- KHÔNG áp đặt đáp án. Trẻ sai, cô không nói \"Sai rồi\" mà nói \"Chúng mình thử xem dự đoán của con có đúng không nhé\", \"Chúng ta có thể kiểm tra bằng cách nào?\". Sai sót là cơ hội học tập.\n- Ưu tiên câu hỏi: Con nhìn thấy gì? Con nghĩ điều gì sẽ xảy ra? Vì sao con nghĩ vậy? Con có cách nào khác không? Nếu thay vật liệu thì sao? Làm thế nào để...? Điều gì đã xảy ra? Con muốn thay đổi điều gì? Con có đồng ý với bạn không, vì sao? Hạn chế câu hỏi có/không, đúng/sai.\n- Mô tả cả thao tác, cử chỉ, cách bao quát của cô (in trong ngoặc hoặc câu mô tả) và hành động của trẻ (trẻ quan sát, sờ, thả vào nước...). Mọi việc cô làm đều có hoạt động tương ứng của trẻ — không để trống cột trẻ.\n- Không biến cô thành người nói liên tục; không biến trẻ thành người chỉ làm theo.\n\n=== D. CÁ NHÂN HOÁ THEO ĐỘ TUỔI (không dùng một giáo án rồi chỉ đổi số tuổi) ===\n- Nhà trẻ 24–36 tháng: 10–15 phút; câu hỏi rất ngắn (3-6 từ), trẻ trả lời bằng từ/câu ngắn, cử chỉ, hành động (\"Trẻ: Con gà!\", \"Trẻ chỉ tay vào...\"); nhiệm vụ 1 bước, vật thật, trải nghiệm giác quan, lặp lại nhiều lần; cô hỗ trợ và làm mẫu nhiều; không bắt buộc bảng ghi chép, bản thiết kế, thuyết trình; hoạt động cả lớp hoặc nhóm nhỏ có cô đi kèm; lĩnh vực theo chương trình nhà trẻ (Phát triển nhận thức, Ngôn ngữ, Thể chất, Tình cảm – kĩ năng xã hội và thẩm mĩ); tuyệt đối chú ý an toàn vật nhỏ, trẻ cho vào miệng.\n- Mẫu giáo bé 3–4 tuổi: 15–20 phút; câu hỏi ngắn gọn; nhiệm vụ đơn giản, nhóm nhỏ; bảng ghi chép/bản thiết kế bằng dán hình, đánh dấu (không bắt buộc); trình bày ngắn, cô gợi ý.\n- Mẫu giáo nhỡ 4–5 tuổi: 20–25 phút; câu hỏi mở hơn, trẻ dự đoán và giải thích đơn giản; làm việc nhóm 4-6 trẻ; bản thiết kế bằng hình vẽ đơn giản; đại diện nhóm trình bày.\n- Mẫu giáo lớn 5–6 tuổi: 25–35 phút; nhiều lựa chọn, dự đoán, giải thích nguyên nhân, tự thiết kế, thử nghiệm, điều chỉnh, bảo vệ ý tưởng, tự đánh giá; tiêu chí sản phẩm có đo đếm.\n\n=== E. AN TOÀN ===\nKiểm tra vật nhỏ, kéo, que nhọn, dây, nước nóng, nhiệt, điện, hoá chất, dị ứng, thực phẩm, vật liệu tái chế chưa vệ sinh, cạnh sắc. Có nguy cơ thì nêu biện pháp kiểm soát trong phần Chuẩn bị (mục An toàn) và điều chỉnh hoạt động. Không giao nhiệm vụ vượt khả năng hoặc không an toàn.\n\n=== F. TỰ KIỂM TRA TRƯỚC KHI TRẢ KẾT QUẢ ===\nĐủ I – II – III; S-T-E-A-M thực chất (đặc biệt T chỉ gồm đồ trẻ dùng); 4C's gắn hành vi; đúng quy trình và đủ giai đoạn; EDP có vấn đề – tiêu chí – thiết kế – thử nghiệm – cải tiến, không làm theo mẫu; trẻ được nghĩ, chọn, thử, sai và sửa, trình bày; lời thoại hai chiều cụ thể; phù hợp độ tuổi; an toàn.\nTrả lời được: \"Trẻ đang giải quyết vấn đề gì, khám phá điều gì, suy nghĩ thế nào và học được gì qua trải nghiệm?\" Khi mâu thuẫn giữa \"đẹp hình thức\" và \"đúng bản chất STEAM\", ưu tiên bản chất.\n\n=== NHIỆM VỤ LẦN NÀY ===\nPhần thông tin, phân tích, I và II của giáo án đã soạn xong (ở cuối tin nhắn). Hãy soạn phần III. CÁCH TIẾN HÀNH khớp ĐÚNG quy trình, nguyên vật liệu, dụng cụ, tiêu chí và mục tiêu đã có.\nĐỘ DÀI: chi tiết nhưng gọn trong một lần trả lời — mỗi giai đoạn chính 5-7 lượt hỏi–đáp, giai đoạn phụ 3-4 lượt; mỗi câu hỏi mở kèm 3-4 câu trả lời đa dạng của trẻ (nhà trẻ ít lượt và câu ngắn hơn). Lời thoại trực tiếp, đúng độ tuổi.\n\nTrả về DUY NHẤT một object JSON:\n{\n  \"cach_tien_hanh\": [\n    {\n      \"ten_buoc\": \"VD: E1 – Khơi gợi, gắn kết  /  Bước 1 – Đặt vấn đề (Hỏi – Tưởng tượng)\",\n      \"thoi_gian\": \"VD: 3 – 4 phút\",\n      \"muc_dich\": \"mục đích ngắn của giai đoạn\",\n      \"tich_hop_steam\": \"thành tố nào được tích hợp và thể hiện ra sao\",\n      \"luot\": [ { \"co\": \"lời dẫn/câu hỏi/thao tác của cô, dùng \\\"Cô: ...\\\"; xuống dòng bằng \\\\n\", \"tre\": \"mỗi trẻ một dòng \\\"- Trẻ 1: ...\\\\n- Trẻ 2: ...\\\" hoặc mô tả hành động\" } ]\n    }\n  ]\n}";
+const EXAMPLE = {"thong_tin":{"ten_hoat_dong":"Bé làm vương miện tặng bạn","chu_de":"Bản thân","linh_vuc":"Trải nghiệm – Chế tạo sản phẩm","do_tuoi":"Mẫu giáo lớn 5–6 tuổi","thoi_gian":"25 – 35 phút","hinh_thuc":"Nhóm (5 – 6 trẻ/nhóm)","quy_trinh":"EDP","muc_do_steam":"Toàn phần"},"phan_tich":{"ban_chat_hoat_dong":"Trẻ giải quyết vấn đề: Bạn Thỏ Bông sắp tổ chức sinh nhật nhưng chưa có vương miện để đội","ly_do_chon_quy_trinh":"Hoạt động tạo ra sản phẩm có tính ứng dụng (chiếc vương miện), trẻ được đặt vấn đề, lên ý tưởng, chế tạo, thử nghiệm và cải tiến nên dùng quy trình EDP.","canh_bao":"","van_de":"Bạn Thỏ Bông sắp tổ chức sinh nhật nhưng chưa có vương miện để đội","tieu_chi_san_pham":["Vừa đầu, không bị rộng hay chật","Các chi tiết trang trí đính chắc, không bị rơi","Màu sắc hài hòa, đẹp mắt"],"gioi_han":["Chỉ sử dụng nguyên vật liệu cô đã chuẩn bị","Hoàn thành trong thời gian 9 – 10 phút"]},"muc_dich_yeu_cau":{"kien_thuc":{"S":"Trẻ nhận biết đặc điểm, đặc tính của một số nguyên vật liệu dùng để làm chiếc vương miện (dải xốp/bìa màu dài 55 – 60 cm, kim tuyến, hạt cườm và hình ngôi sao, trái tim, hình tròn cắt sẵn bằng xốp kim tuyến).","T":"Trẻ biết sử dụng các công cụ, dụng cụ đơn giản (băng dính 2 mặt, keo dán khô và kéo thủ công đầu tròn) để liên kết vật liệu, tạo ra chiếc vương miện.","E":"Trẻ hiểu được quy trình tạo ra chiếc vương miện (quan sát mẫu, lên ý tưởng, vẽ bản thiết kế, chọn nguyên liệu, uốn cong dải xốp tạo khung, gắn chi tiết trang trí, cố định hai đầu, thử nghiệm và cải tiến).","A":"Trẻ phối hợp màu sắc, hình dạng và cách sắp xếp nguyên liệu tạo thành chiếc vương miện hài hòa, đẹp mắt; biết quan tâm, chia sẻ niềm vui với bạn bè.","M":"Trẻ ứng dụng kỹ năng đếm, so sánh, ước lượng (kích thước, số lượng nguyên liệu, đo) khi làm chiếc vương miện."},"ky_nang":{"tu_duy_phan_bien":"Trẻ biết kiểm tra sản phẩm theo tiêu chí (vừa đầu, không bị rộng hay chật; các chi tiết trang trí đính chắc, không bị rơi; màu sắc hài hòa, đẹp mắt), nhận ra điểm chưa đạt và tìm cách sửa.","sang_tao":"Trẻ tự đưa ra ý tưởng, lựa chọn kiểu dáng, nguyên liệu và cách trang trí chiếc vương miện theo ý thích.","hop_tac":"Trẻ biết phân công, hỗ trợ bạn trong nhóm (giúp bạn giữ dải giấy khi đo vòng đầu, dán cố định hai đầu vương miện).","giao_tiep":"Trẻ trình bày được bản thiết kế, cách làm, khó khăn và cách sửa; tự tin giới thiệu chiếc vương miện trước cô và các bạn.","ky_nang_khac":"Vận động tinh (cắt, dán, gắn, uốn); quan sát, so sánh; sử dụng băng dính 2 mặt, keo dán khô và kéo thủ công đầu tròn an toàn."},"thai_do":["Trẻ tích cực, hứng thú tham gia thử thách làm chiếc vương miện.","Trẻ kiên trì hoàn thành sản phẩm, biết giữ gìn đồ dùng và cùng cô thu dọn sau khi học."]},"chuan_bi":{"co":{"tam_the_tam_ly_suc_khoe":"Thoải mái, năng lượng, vui vẻ; sức khỏe tốt; nắm vững quy trình EDP và dự kiến các tình huống trẻ có thể gặp (vương miện bị rộng hoặc hẹp, chi tiết trang trí bị rơi).","do_dung_hoc_lieu":["Bảng thiết kế cho mỗi nhóm (giấy vẽ + bút màu).","Chiếc vương miện mẫu do cô làm sẵn (hoặc hình ảnh).","Nguyên vật liệu: dải xốp/bìa màu dài 55 – 60 cm, kim tuyến, hạt cườm và hình ngôi sao, trái tim, hình tròn cắt sẵn bằng xốp kim tuyến.","Dụng cụ: băng dính 2 mặt, keo dán khô và kéo thủ công đầu tròn.","Nhạc nền, bài hát \"Mừng sinh nhật\"."],"moi_truong":"Không gian lớp học rộng rãi, chia khu vực theo nhóm; có khu vực thử nghiệm và trưng bày sản phẩm.","an_toan":["Kiểm tra nguyên vật liệu sạch sẽ, không có cạnh sắc, không quá nhỏ để tránh trẻ cho vào miệng, mũi, tai.","Kéo mầm non đầu tròn; nhắc trẻ cầm kéo đúng cách, không chĩa vào bạn.","Keo dán khô/keo sữa an toàn; không dùng súng bắn keo nóng cho trẻ."]},"tre":{"tam_the_tam_ly_suc_khoe":"Tâm lý vui vẻ, sẵn sàng tham gia trải nghiệm; sức khỏe ổn định.","do_dung_nguyen_lieu":[],"trang_phuc":"Gọn gàng, thoải mái khi di chuyển và vận động.","an_toan":"Thuộc quy tắc không ngậm đồ chơi, nguyên liệu nhỏ; sử dụng dụng cụ theo hướng dẫn."},"phu_huynh":[]},"cach_tien_hanh":[{"ten_buoc":"Bước 1 – Đặt vấn đề (Hỏi – Tưởng tượng)","thoi_gian":"3 – 4 phút","muc_dich":"Tạo tình huống có vấn đề; trẻ đưa ra ý tưởng và cùng cô chốt tiêu chí sản phẩm.","tich_hop_steam":"A – lồng ghép âm nhạc/câu chuyện; S – trẻ nêu hiểu biết ban đầu.","luot":[{"co":"Cô cho trẻ hát, vận động theo bài hát \"Mừng sinh nhật\"; trẻ ngồi đội hình chữ U.\nCô: Các con ơi, hôm nay lớp mình nhận được một tin nhắn đặc biệt. Chúng mình cùng nghe nhé!","tre":"- Trẻ hát, vận động cùng cô.\n- Trẻ ngồi đội hình chữ U, chú ý lắng nghe."},{"co":"Cô mở tin nhắn (hoặc kể chuyện): \"Bạn Thỏ Bông sắp tổ chức sinh nhật nhưng chưa có vương miện để đội. Các bạn lớp mình giúp với nhé!\"\nCô: Các con vừa nghe thấy chuyện gì xảy ra?","tre":"- Trẻ 1: Bạn ấy đang gặp khó khăn ạ.\n- Trẻ 2: Bạn ấy cần chiếc vương miện ạ.\n- Trẻ 3: Lớp mình phải giúp bạn ạ."},{"co":"Cô: Theo các con, chúng mình có thể làm gì để giúp bạn?","tre":"- Trẻ 1: Con sẽ làm chiếc vương miện tặng bạn ạ.\n- Trẻ 2: Mình đi mua cho bạn ạ.\n- Trẻ 3: Con mang ở nhà đến ạ.\n- Trẻ 4: Cả lớp mình cùng làm ạ."},{"co":"Cô lắng nghe, không nhận xét đúng – sai, khen các ý tưởng.\nCô: Có rất nhiều ý tưởng hay! Nếu tự làm chiếc vương miện thì các con muốn làm như thế nào?","tre":"- Trẻ 1: Con làm bằng dải xốp/bìa màu ạ.\n- Trẻ 2: Con muốn làm thật to ạ.\n- Trẻ 3: Con sẽ trang trí nhiều màu ạ."},{"co":"Cô: Vậy chiếc vương miện lớp mình làm cần đạt được những gì thì mới giúp được bạn?","tre":"- Trẻ 1: Vừa đầu, không bị rộng hay chật ạ.\n- Trẻ 2: Các chi tiết trang trí đính chắc, không bị rơi ạ.\n- Trẻ 3: Màu sắc hài hòa, đẹp mắt ạ."},{"co":"Cô chốt vấn đề và tiêu chí: \"Lớp mình sẽ làm chiếc vương miện. Chiếc vương miện cần: vừa đầu, không bị rộng hay chật; các chi tiết trang trí đính chắc, không bị rơi; màu sắc hài hòa, đẹp mắt.\"\nCô: Chúng mình cùng tìm hiểu xem làm chiếc vương miện như thế nào nhé!","tre":"- Trẻ lắng nghe, nhắc lại tiêu chí cùng cô."}]},{"ten_buoc":"Bước 2 – Khám phá","thoi_gian":"4 – 5 phút","muc_dich":"Trẻ khám phá sản phẩm mẫu, đặc tính của nguyên vật liệu; cô lưu ý phần khó, phần nguy hiểm.","tich_hop_steam":"S – đặc tính vật liệu; T – làm quen dụng cụ (băng dính 2 mặt, keo dán khô và kéo thủ công đầu tròn); M – đếm, so sánh.","luot":[{"co":"Cô đưa ra chiếc vương miện mẫu (hoặc hình ảnh).\nCô: Các con nhìn xem đây là gì? Nó được làm từ những gì?","tre":"- Trẻ 1: Đây là chiếc vương miện ạ.\n- Trẻ 2: Làm bằng dải xốp/bìa màu ạ.\n- Trẻ 3: Có cả kim tuyến nữa ạ."},{"co":"Cô: Chiếc vương miện có những bộ phận nào? Các bộ phận được gắn với nhau bằng cách nào?","tre":"- Trẻ 1: Có vòng đội đầu và các hình trang trí ạ.\n- Trẻ 2: Dán bằng băng dính 2 mặt ạ.\n- Trẻ 3: Con nghĩ là buộc lại ạ."},{"co":"Cô cho các nhóm cầm, sờ, thử uốn, gấp các nguyên vật liệu: dải xốp/bìa màu dài 55 – 60 cm, kim tuyến, hạt cườm và hình ngôi sao, trái tim, hình tròn cắt sẵn bằng xốp kim tuyến.\nCô: Con thấy vật liệu này thế nào? Cứng hay mềm, có uốn cong được không?","tre":"- Trẻ cầm, sờ, thử uốn, gấp vật liệu.\n- Trẻ 1: Cái này mềm, uốn cong được ạ.\n- Trẻ 2: Cái này cứng hơn ạ.\n- Trẻ 3: Cái này lấp lánh ạ."},{"co":"Cô: Theo các con, vật liệu nào giúp chiếc vương miện vừa đầu, không bị rộng hay chật? Vì sao?","tre":"- Trẻ 1: Dải xốp/bìa màu ạ, vì nó chắc ạ.\n- Trẻ 2: Con chọn kim tuyến ạ.\n- Trẻ 3: Con chưa biết, con muốn thử ạ."},{"co":"Cô: Chúng mình thử nhanh xem nhé! (Cô cho trẻ thử.)\nCô lưu ý: \"Khi dùng kéo phải cầm đúng cách, không chĩa mũi kéo vào bạn. Không cho nguyên liệu nhỏ vào miệng, mũi, tai.\"","tre":"- Trẻ thử, nêu nhận xét.\n- Trẻ lắng nghe lưu ý an toàn."}]},{"ten_buoc":"Bước 3 – Lập kế hoạch (lên ý tưởng, thiết kế)","thoi_gian":"5 – 6 phút","muc_dich":"Trẻ/nhóm nêu ý tưởng, chọn nguyên liệu, cách làm và vẽ bản thiết kế.","tich_hop_steam":"E – lên ý tưởng, thiết kế; A – lựa chọn màu sắc, hình dạng; M – ước lượng số lượng nguyên liệu.","luot":[{"co":"Cô chia trẻ thành 4 – 5 nhóm, mỗi nhóm 5 – 6 trẻ, phát bảng thiết kế cho mỗi nhóm.\nCô: Nhóm con muốn làm chiếc vương miện như thế nào? Dùng những nguyên liệu gì?","tre":"- Trẻ về nhóm, thảo luận.\n- Trẻ 1: Nhóm con làm bằng dải xốp/bìa màu ạ.\n- Trẻ 2: Nhóm con sẽ thêm hình ngôi sao, trái tim, hình tròn ạ."},{"co":"Cô: Các con hãy vẽ ý tưởng của nhóm vào bảng thiết kế: hình dạng, nguyên liệu, số lượng.","tre":"- Trẻ vẽ, dán hình nguyên liệu, đánh dấu số lượng lên bảng thiết kế."},{"co":"Cô đến từng nhóm, hỏi gợi mở: \"Phần nào khó nhất? Con định làm phần đó thế nào? Ai sẽ làm việc gì?\"","tre":"- Trẻ 1: Phần đo vòng đầu khó nhất ạ.\n- Trẻ 2: Con cắt, bạn dán ạ.\n- Trẻ 3: Con sẽ đo trước rồi mới cắt ạ."},{"co":"Cô mời đại diện 1 – 2 nhóm chia sẻ bản thiết kế.\nCô: Các bạn khác có ý kiến gì không? Có cách nào làm tốt hơn không?","tre":"- Đại diện nhóm trình bày bản thiết kế.\n- Trẻ nhóm khác góp ý: \"Thêm băng dính cho chắc hơn ạ.\""}]},{"ten_buoc":"Bước 4 – Thực hiện (chế tạo)","thoi_gian":"9 – 10 phút","muc_dich":"Trẻ tự lấy nguyên liệu, thực hành làm sản phẩm; cô bao quát, gợi mở, không làm thay.","tich_hop_steam":"E – chế tạo; T – sử dụng băng dính 2 mặt, keo dán khô và kéo thủ công đầu tròn; M – đếm, đo; A – trang trí.","luot":[{"co":"Cô: Các nhóm lấy nguyên liệu theo bản thiết kế và bắt đầu làm nhé! (Cô bật nhạc nhẹ theo chủ đề.)","tre":"- Trẻ lấy nguyên liệu, dụng cụ về nhóm.\n- Trẻ phân công, bắt đầu làm chiếc vương miện."},{"co":"Cô bao quát, đến từng nhóm: \"Nhóm con đang làm đến đâu rồi? Con đang làm phần nào?\"","tre":"- Trẻ 1: Con đang gắn dải xốp/bìa màu ạ.\n- Trẻ 2: Con đang trang trí ạ."},{"co":"Khi trẻ gặp khó (vật liệu không dính, bị rơi, bị lệch...), cô không làm thay mà hỏi: \"Vì sao bị như vậy? Con thử cách khác được không?\"","tre":"- Trẻ 1: Vì keo ít quá ạ.\n- Trẻ 2: Con dùng keo dán khô thay ạ.\n- Trẻ thử lại cách khác."},{"co":"Cô động viên nhóm làm chậm, nhắc trẻ dùng dụng cụ an toàn, giữ gọn nguyên liệu.\nCô: Còn 2 phút nữa, các nhóm hoàn thiện nhé!","tre":"- Trẻ hoàn thiện, kiểm tra lại chiếc vương miện."}]},{"ten_buoc":"Bước 5 – Thử nghiệm, đánh giá, cải tiến, trưng bày, kết thúc","thoi_gian":"6 – 7 phút","muc_dich":"Trẻ thử sản phẩm theo tiêu chí, cải tiến nếu chưa đạt, trưng bày và chia sẻ.","tich_hop_steam":"E – thử nghiệm, cải tiến; A – vẻ đẹp sản phẩm và giáo dục: biết quan tâm, chia sẻ niềm vui với bạn bè.","luot":[{"co":"Cô: Chúng mình cùng thử xem chiếc vương miện của các nhóm đã đạt yêu cầu chưa nhé! Tiêu chí thứ nhất: vừa đầu, không bị rộng hay chật.","tre":"- Trẻ thử nghiệm chiếc vương miện theo từng tiêu chí.\n- Trẻ 1: Của nhóm con đạt rồi ạ!\n- Trẻ 2: Của nhóm con chưa được ạ."},{"co":"Cô: Vì sao chiếc vương miện của nhóm con chưa đạt? Nhóm con sẽ sửa thế nào?","tre":"- Trẻ 1: Vì vương miện bị rộng quá ạ.\n- Trẻ 2: Con sẽ dán thêm cho chắc ạ.\n- Trẻ 3: Con làm lại phần đo vòng đầu ạ."},{"co":"Cô cho các nhóm chưa đạt thêm thời gian cải tiến rồi thử nghiệm lại.","tre":"- Trẻ điều chỉnh, thử nghiệm lại."},{"co":"Cô cho trẻ trưng bày sản phẩm, mời đại diện nhóm giới thiệu: \"Nhóm con làm chiếc vương miện bằng gì? Làm như thế nào? Có khó khăn gì và đã sửa ra sao?\"","tre":"- Đại diện nhóm: \"Nhóm con làm chiếc vương miện bằng dải xốp/bìa màu, kim tuyến, hạt cườm và hình ngôi sao, trái tim, hình tròn. Lúc đầu bị rộng quá, nhóm con đã cắt bớt rồi dán lại ạ.\""},{"co":"Cô: Con thích chiếc vương miện của nhóm nào? Vì sao?","tre":"- Trẻ 1: Con thích của nhóm bạn vì đẹp ạ.\n- Trẻ 2: Vì làm chắc chắn ạ."},{"co":"Cô nhận xét chung về quá trình (hợp tác, kiên trì, sáng tạo) và giáo dục: biết quan tâm, chia sẻ niềm vui với bạn bè.\nCô cho trẻ dùng chiếc vương miện để giải quyết tình huống ban đầu, cùng trẻ thu dọn đồ dùng.","tre":"- Trẻ lắng nghe, dùng sản phẩm.\n- Trẻ cùng cô thu dọn đồ dùng, nguyên liệu."}]}]};
+
+/* ---------- Dữ liệu cố định ---------- */
+const AGES = [
+  { id: 'nt', label: 'Nhà trẻ 24–36 tháng', a: 'Nhà trẻ', b: '24–36 tháng' },
+  { id: 'mgb', label: 'Mẫu giáo bé 3–4 tuổi', a: 'Mẫu giáo bé', b: '3–4 tuổi' },
+  { id: 'mgn', label: 'Mẫu giáo nhỡ 4–5 tuổi', a: 'Mẫu giáo nhỡ', b: '4–5 tuổi' },
+  { id: 'mgl', label: 'Mẫu giáo lớn 5–6 tuổi', a: 'Mẫu giáo lớn', b: '5–6 tuổi' }
+];
+const STEAM = [['S', 'Science', 'Khoa học'], ['T', 'Technology', 'Công nghệ'], ['E', 'Engineering', 'Kỹ thuật'], ['A', 'Art', 'Nghệ thuật'], ['M', 'Mathematics', 'Toán học']];
+const SKILLS = [['tu_duy_phan_bien', 'Critical Thinking (Tư duy phản biện)'], ['sang_tao', 'Creativity (Sáng tạo)'], ['hop_tac', 'Collaboration (Hợp tác)'], ['giao_tiep', 'Communication (Giao tiếp)']];
+const PREP_CO = [['tam_the_tam_ly_suc_khoe', 'Tâm thế – tâm lý – sức khỏe'], ['do_dung_hoc_lieu', 'Đồ dùng – học liệu – nguyên vật liệu'], ['moi_truong', 'Môi trường'], ['an_toan', 'An toàn']];
+const PREP_TRE = [['tam_the_tam_ly_suc_khoe', 'Tâm thế – tâm lý – sức khỏe'], ['do_dung_nguyen_lieu', 'Đồ dùng – nguyên vật liệu'], ['trang_phuc', 'Trang phục'], ['an_toan', 'An toàn']];
+const BLANK = '«…»';
+
+/* ---------- Tiện ích ---------- */
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const toList = (v) => Array.isArray(v) ? v.map((x) => String(x ?? '').trim()).filter(Boolean) : (String(v ?? '').trim() ? [String(v).trim()] : []);
+const lines = (s) => String(s ?? '').split(/\n+/).map((x) => x.trim()).filter(Boolean);
+const getPath = (o, p) => p.split('.').reduce((a, k) => (a == null ? a : a[k]), o);
+function setPath(o, p, v) { const ks = p.split('.'); const last = ks.pop(); ks.reduce((a, k) => a[k], o)[last] = v; }
+function slug(s) {
+  return (String(s || 'STEAM').normalize('NFD').replace(/\p{M}/gu, '').replace(/đ/g, 'd').replace(/Đ/g, 'D')
+    .replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '') || 'STEAM').slice(0, 60);
+}
+const store = {
+  get() { try { return JSON.parse(localStorage.getItem('vuonuom.plans') || '[]'); } catch { return []; } },
+  set(list) { try { localStorage.setItem('vuonuom.plans', JSON.stringify(list.slice(0, 12))); } catch {} }
+};
+
+/* ---------- Logo hoa 5 cánh ---------- */
+(function logo() {
+  const cols = ['var(--s)', 'var(--t)', 'var(--e)', 'var(--a)', 'var(--m)'];
+  let h = '';
+  for (let i = 0; i < 5; i++) {
+    const ang = (i / 5) * 2 * Math.PI - Math.PI / 2, x = 50 + Math.cos(ang) * 22, y = 50 + Math.sin(ang) * 22;
+    h += `<ellipse cx="${x}" cy="${y}" rx="15" ry="22" fill="${cols[i]}" transform="rotate(${ang * 180 / Math.PI + 90} ${x} ${y})"/>`;
+  }
+  $('logo').innerHTML = h + '<circle cx="50" cy="50" r="13" fill="var(--surface)" stroke="var(--fg)" stroke-width="1.5"/>';
+})();
+
+/* ---------- Trạng thái ---------- */
+let age = 'mgl';
+let current = { id: 'example', example: true, plan: EXAMPLE };
+let busy = false, ctl = null;
+
+$('ages').innerHTML = AGES.map((a) => `<button type="button" class="age" data-age="${a.id}" aria-pressed="${a.id === age}">${a.a}<small>${a.b}</small></button>`).join('');
+$('ages').addEventListener('click', (e) => {
+  const b = e.target.closest('.age'); if (!b || busy) return;
+  age = b.dataset.age;
+  document.querySelectorAll('.age').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+});
+
+/* ---------- Hiển thị giáo án (sửa trực tiếp) ---------- */
+function ed(path, cls = '') {
+  const v = getPath(current.plan, path) ?? '';
+  return `<div class="ed ${cls}${String(v).includes(BLANK) ? ' blank' : ''}" contenteditable="true" spellcheck="false" data-path="${path}">${esc(v)}</div>`;
+}
+function field(path) {
+  const v = getPath(current.plan, path);
+  if (!Array.isArray(v)) return ed(path);
+  return `<ul class="items">${v.map((_, i) => `<li>${ed(`${path}.${i}`, 'inline')}</li>`).join('')}</ul>`;
+}
+function render() {
+  const p = current.plan, ti = p.thong_tin || {}, pt = p.phan_tich || {}, md = p.muc_dich_yeu_cau || {}, cb = p.chuan_bi || {};
+  const steps = p.cach_tien_hanh || [];
+  $('result').innerHTML = `
+  <section class="panel head">
+    ${current.example ? '<span class="example-tag">Giáo án mẫu — nhập đề tài của bạn bên trái để soạn mới</span>' : ''}
+    <div class="eyebrow">Giáo án STEAM · ${esc(ti.quy_trinh || '')}${ti.muc_do_steam ? ' · STEAM ' + esc(String(ti.muc_do_steam).toLowerCase()) : ''}</div>
+    <h2>${ed('thong_tin.ten_hoat_dong')}</h2>
+    <div class="meta">
+      ${[['Chủ đề', 'chu_de'], ['Lĩnh vực', 'linh_vuc'], ['Độ tuổi', 'do_tuoi'], ['Thời gian', 'thoi_gian'], ['Hình thức', 'hinh_thuc']]
+        .map(([l, k]) => `<div><span>${l}</span>${ed('thong_tin.' + k)}</div>`).join('')}
+    </div>
+    ${pt.canh_bao ? `<div class="warn">${esc(pt.canh_bao)}</div>` : ''}
+    <div class="analysis">
+      ${pt.ban_chat_hoat_dong ? `<div><b>Bản chất hoạt động:</b> ${esc(pt.ban_chat_hoat_dong)}</div>` : ''}
+      ${pt.ly_do_chon_quy_trinh ? `<div><b>Vì sao chọn ${esc(ti.quy_trinh || '')}:</b> ${esc(pt.ly_do_chon_quy_trinh)}</div>` : ''}
+    </div>
+    <div class="tools">
+      <button type="button" class="btn ghost" id="wordBtn" ${steps.length ? '' : 'disabled'}>Tải file Word</button>
+      <button type="button" class="btn ghost" id="copyBtn">Sao chép</button>
+      <span class="note" id="toolNote">Bấm vào chữ bất kỳ để sửa trước khi tải.</span>
+    </div>
+  </section>
+
+  <section class="panel sec">
+    <h3><span class="n" style="background:var(--s)">I</span>Mục đích – Yêu cầu</h3>
+    <h4>1. Kiến thức</h4>
+    <div class="steam">
+      ${STEAM.map(([k, en, vi]) => `<div class="${k}"><div class="L">${k}</div><div class="body"><b>${k} – ${en}</b> <span style="color:var(--muted);font-size:12.5px">(${vi})</span>${field('muc_dich_yeu_cau.kien_thuc.' + k)}</div></div>`).join('')}
+    </div>
+    <h4>2. Kỹ năng – Nhóm kỹ năng 4C's</h4>
+    <div class="skills">${SKILLS.map(([k, l]) => `<div><b>${l}</b>${field('muc_dich_yeu_cau.ky_nang.' + k)}</div>`).join('')}</div>
+    <div style="margin-top:8px"><b>Kỹ năng khác:</b> ${field('muc_dich_yeu_cau.ky_nang.ky_nang_khac')}</div>
+    <h4>3. Thái độ</h4>
+    ${field('muc_dich_yeu_cau.thai_do')}
+  </section>
+
+  <section class="panel sec">
+    <h3><span class="n" style="background:var(--t)">II</span>Chuẩn bị</h3>
+    <div class="prep">
+      <div><div class="t">1. Chuẩn bị của Cô</div>${PREP_CO.filter(([k]) => toList(cb.co?.[k]).length).map(([k, l]) => `<div class="k">${l}</div>${field('chuan_bi.co.' + k)}`).join('')}</div>
+      <div><div class="t">2. Chuẩn bị của Trẻ</div>${PREP_TRE.filter(([k]) => toList(cb.tre?.[k]).length).map(([k, l]) => `<div class="k">${l}</div>${field('chuan_bi.tre.' + k)}`).join('')}
+        ${toList(cb.phu_huynh).length ? `<div class="t" style="margin-top:12px">3. Phối hợp với Phụ huynh</div>${field('chuan_bi.phu_huynh')}` : ''}</div>
+    </div>
+  </section>
+
+  <section class="panel sec">
+    <h3><span class="n" style="background:var(--e)">III</span>Cách tiến hành</h3>
+    ${steps.length ? `<div class="scroll"><table class="flow">
+      <thead><tr><th>Hoạt động của Cô</th><th>Hoạt động của Trẻ</th></tr></thead>
+      <tbody>${steps.map((s, i) => `
+        <tr class="step"><td colspan="2"><div class="step-title">${ed(`cach_tien_hanh.${i}.ten_buoc`, 'inline')}<span class="step-time">${esc(s.thoi_gian || '')}</span></div>
+          ${s.muc_dich ? `<div class="step-purpose">${ed(`cach_tien_hanh.${i}.muc_dich`, 'inline')}</div>` : ''}</td></tr>
+        ${(s.luot || []).map((_, j) => `<tr><td>${ed(`cach_tien_hanh.${i}.luot.${j}.co`)}</td><td class="tre">${ed(`cach_tien_hanh.${i}.luot.${j}.tre`)}</td></tr>`).join('')}
+        ${s.tich_hop_steam ? `<tr class="integ"><td colspan="2">Tích hợp STEAM: ${ed(`cach_tien_hanh.${i}.tich_hop_steam`, 'inline')}</td></tr>` : ''}`).join('')}
+      </tbody></table></div>`
+      : `<div class="pending">${busy ? '<span class="spin"></span>Claude đang soạn phần Cách tiến hành…' : 'Chưa có phần Cách tiến hành.'}${!busy && current.part3Error ? '<br><button type="button" class="btn ghost" id="retry3" style="margin-top:10px">Soạn lại phần Cách tiến hành</button>' : ''}</div>`}
+  </section>`;
+  $('wordBtn').addEventListener('click', downloadWord);
+  $('copyBtn').addEventListener('click', copyAll);
+  $('retry3')?.addEventListener('click', () => runPart3(current));
+}
+
+// Lưu chỉnh sửa vào dữ liệu giáo án.
+let saveT;
+$('result').addEventListener('input', (e) => {
+  const el = e.target.closest('.ed'); if (!el) return;
+  const t = el.innerText.replace(/\n+$/, '');
+  setPath(current.plan, el.dataset.path, t);
+  el.classList.toggle('blank', t.includes(BLANK));
+  clearTimeout(saveT); saveT = setTimeout(saveHistory, 700);
+});
+$('result').addEventListener('paste', (e) => {
+  if (!e.target.closest('.ed')) return;
+  e.preventDefault();
+  document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
+});
+
+/* ---------- Lịch sử trên máy ---------- */
+function saveHistory() {
+  if (current.example || !current.plan?.cach_tien_hanh?.length) return;
+  const list = store.get().filter((x) => x.id !== current.id);
+  list.unshift({ id: current.id, at: Date.now(), plan: current.plan });
+  store.set(list); renderHistory();
+}
+function renderHistory() {
+  const list = store.get();
+  $('history').hidden = !list.length;
+  $('histList').innerHTML = list.map((h) => `<li><button type="button" data-id="${esc(h.id)}"><b>${esc(h.plan.thong_tin?.ten_hoat_dong)}</b><span>${esc(h.plan.thong_tin?.do_tuoi || '')} · ${esc(h.plan.thong_tin?.quy_trinh || '')} · ${new Date(h.at).toLocaleDateString('vi-VN')}</span></button></li>`).join('');
+}
+$('histList').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b || busy) return;
+  const h = store.get().find((x) => x.id === b.dataset.id);
+  if (h) { current = { id: h.id, plan: h.plan }; render(); $('result').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+});
+
+/* ---------- Gọi Claude ---------- */
+const ERR = {
+  not_granted: 'Bạn chưa cho phép trang này dùng Claude. Tải lại trang và bấm Cho phép khi được hỏi.',
+  rate_limited: 'Đang có quá nhiều yêu cầu. Đợi một lát rồi bấm Soạn lại.',
+  session_expired: 'Phiên đăng nhập Claude đã hết hạn. Tải lại trang rồi thử lại.',
+  sampling_disabled: 'Tài khoản hoặc tổ chức của bạn đang tắt tính năng gọi Claude từ trang này.',
+  refused: 'Claude từ chối đề tài này. Hãy diễn đạt lại tên đề tài.',
+  invalid_json: 'Câu trả lời của Claude quá dài hoặc sai định dạng nên bị cắt. Bấm Soạn lại.',
+  empty_completion: 'Claude không trả lời. Bấm Soạn lại.',
+  upstream_error: 'Claude đang bận hoặc gặp lỗi. Đợi một lát rồi bấm Soạn lại.',
+  queue_overflow: 'Đang có quá nhiều yêu cầu. Đợi một lát rồi thử lại.'
+};
+const errMsg = (e) => ERR[e?.code] || `Không soạn được giáo án (${e?.code || 'lỗi'}). ${e?.message || ''}`;
+
+function setStatus(html, kind = '') {
+  const s = $('status'); s.hidden = !html; s.className = 'status' + (kind ? ' ' + kind : ''); s.innerHTML = html || '';
+}
+function progress(label, n, expected) {
+  setStatus(`<div><span class="spin"></span>${label}</div><div class="bar"><i style="width:${Math.max(4, Math.min(96, n / expected * 100))}%"></i></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="font-size:12px;color:var(--muted)">${n ? `Đã viết ${n.toLocaleString('vi-VN')} ký tự` : 'Claude đang suy nghĩ…'}</span>
+    <button type="button" class="btn ghost" id="stop">Dừng</button></div>`);
+  $('stop').onclick = () => ctl?.abort();
+}
+
+let samplePromise = null;
+function getSample() { samplePromise ??= window.claude?.use ? window.claude.use('sample') : Promise.resolve(null); return samplePromise; }
+
+$('form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (busy) return;
+  const chuDe = $('chuDe').value.trim(), deTai = $('deTai').value.trim();
+  if (!deTai) { setStatus('Nhập tên đề tài trước khi soạn.', 'err'); $('deTai').focus(); return; }
+  const sample = await getSample();
+  if (!sample) { setStatus('Trang này cần được mở trong Claude (claude.ai hoặc ứng dụng Claude) để soạn giáo án.', 'err'); return; }
+  const ageLabel = AGES.find((a) => a.id === age).label;
+  const info = `THÔNG TIN GIÁO VIÊN NHẬP:\n- Độ tuổi: ${ageLabel}\n- Chủ đề: ${chuDe || '(tự chọn chủ đề phù hợp với đề tài)'}\n- Tên đề tài: ${deTai}`;
+  busy = true; $('go').disabled = true;
+  ctl = new AbortController();
+  const job = { id: String(Date.now()), plan: null, info, ageLabel };
+  try {
+    progress('Bước 1/2: phân tích đề tài, soạn Mục đích – Yêu cầu và Chuẩn bị…', 0, 6000);
+    const p1 = await sample.json(PROMPT1 + '\n\n' + info, {
+      signal: ctl.signal, modelTier: 'default',
+      onText: ({ text }) => progress('Bước 1/2: phân tích đề tài, soạn Mục đích – Yêu cầu và Chuẩn bị…', text.length, 6000)
+    });
+    if (!p1 || !p1.muc_dich_yeu_cau || !p1.chuan_bi) throw { code: 'invalid_json' };
+    p1.thong_tin = { ...(p1.thong_tin || {}), do_tuoi: p1.thong_tin?.do_tuoi || ageLabel };
+    job.plan = { ...p1, cach_tien_hanh: [] };
+    current = job;
+    render();
+    $('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    await runPart3(job, sample);
+  } catch (err) {
+    busy = false; $('go').disabled = false;
+    if (err?.code === 'cancelled') setStatus('Đã dừng.', ''); else setStatus(errMsg(err), 'err');
+    if (current === job) render();
+  }
+});
+
+async function runPart3(job, sampleArg) {
+  const sample = sampleArg || await getSample();
+  if (!sample) return;
+  busy = true; $('go').disabled = true; job.part3Error = false;
+  ctl = new AbortController();
+  if (current === job) render();
+  const { cach_tien_hanh, ...head } = job.plan;
+  try {
+    progress('Bước 2/2: soạn Cách tiến hành (bảng Cô | Trẻ, lời thoại)…', 0, 14000);
+    const p2 = await sample.json(PROMPT2 + '\n\n' + job.info + '\n\nPHẦN GIÁO ÁN ĐÃ SOẠN (I, II):\n' + JSON.stringify(head), {
+      signal: ctl.signal, modelTier: 'default',
+      onText: ({ text }) => progress('Bước 2/2: soạn Cách tiến hành (bảng Cô | Trẻ, lời thoại)…', text.length, 14000)
+    });
+    const steps = Array.isArray(p2) ? p2 : p2?.cach_tien_hanh;
+    if (!Array.isArray(steps) || !steps.length) throw { code: 'invalid_json' };
+    job.plan.cach_tien_hanh = steps;
+    setStatus('Đã soạn xong. Rà soát, sửa trực tiếp rồi tải file Word.');
+    if (current === job) { saveHistory(); }
+  } catch (err) {
+    job.part3Error = true;
+    if (err?.code === 'cancelled') setStatus('Đã dừng. Phần I, II vẫn giữ; bấm "Soạn lại phần Cách tiến hành" để soạn tiếp.');
+    else setStatus(errMsg(err), 'err');
+  } finally {
+    busy = false; $('go').disabled = false;
+    if (current === job) render();
+  }
+}
+
+/* ---------- Sao chép ---------- */
+function planText(p) {
+  const L = [], ti = p.thong_tin || {}, md = p.muc_dich_yeu_cau || {}, cb = p.chuan_bi || {};
+  const item = (label, v, pad = '') => { const xs = toList(v); if (!xs.length) return; if (xs.length === 1) L.push(`${pad}- ${label}: ${xs[0]}`); else { L.push(`${pad}- ${label}:`); xs.forEach((x) => L.push(`${pad}  + ${x}`)); } };
+  L.push('GIÁO ÁN STEAM', '');
+  [['Tên hoạt động', ti.ten_hoat_dong], ['Chủ đề', ti.chu_de], ['Lĩnh vực', ti.linh_vuc], ['Độ tuổi', ti.do_tuoi], ['Thời gian', ti.thoi_gian], ['Hình thức', ti.hinh_thuc], ['Quy trình', ti.quy_trinh], ['Áp dụng STEAM', ti.muc_do_steam]].forEach(([k, v]) => v && L.push(`${k}: ${v}`));
+  L.push('', 'I. MỤC ĐÍCH - YÊU CẦU', '1. Kiến thức');
+  STEAM.forEach(([k, en]) => item(`${k} – ${en}`, toList(md.kien_thuc?.[k]).length ? md.kien_thuc[k] : 'Không áp dụng.'));
+  L.push('2. Kỹ năng', "- Nhóm kỹ năng 4C's:");
+  SKILLS.forEach(([k, l]) => toList(md.ky_nang?.[k]).forEach((x) => L.push(`  + ${l}: ${x}`)));
+  item('Kỹ năng khác', md.ky_nang?.ky_nang_khac);
+  L.push('3. Thái độ'); toList(md.thai_do).forEach((x) => L.push('- ' + x));
+  L.push('', 'II. CHUẨN BỊ', '1. Chuẩn bị của Cô'); PREP_CO.forEach(([k, l]) => item(l, cb.co?.[k]));
+  L.push('2. Chuẩn bị của Trẻ'); PREP_TRE.forEach(([k, l]) => item(l, cb.tre?.[k]));
+  if (toList(cb.phu_huynh).length) { L.push('3. Phối hợp chuẩn bị với Phụ huynh học sinh'); toList(cb.phu_huynh).forEach((x) => L.push('- ' + x)); }
+  L.push('', 'III. CÁCH TIẾN HÀNH');
+  (p.cach_tien_hanh || []).forEach((s) => {
+    L.push('', `${s.ten_buoc}${s.thoi_gian ? ` (${s.thoi_gian})` : ''}`);
+    (s.luot || []).forEach((t) => { L.push('[Cô]'); lines(t.co).forEach((x) => L.push('  ' + x)); L.push('[Trẻ]'); lines(t.tre).forEach((x) => L.push('  ' + x)); });
+  });
+  return L.join('\n');
+}
+async function copyAll() {
+  const note = $('toolNote');
+  try { await navigator.clipboard.writeText(planText(current.plan)); note.textContent = 'Đã sao chép toàn bộ giáo án.'; }
+  catch { note.textContent = 'Trình duyệt không cho sao chép tự động. Hãy bôi đen nội dung rồi nhấn Ctrl+C.'; }
+}
+
+/* ---------- Xuất Word (A4, Times New Roman 13; phần III một bảng, mỗi bước một hàng) ---------- */
+async function downloadWord() {
+  const note = $('toolNote');
+  const downloads = window.claude?.use ? await window.claude.use('downloads') : null;
+  if (!downloads) { note.textContent = 'Tải file chỉ dùng được khi mở trang trong Claude. Hãy dùng nút Sao chép.'; return; }
+  if (typeof docx === 'undefined') { note.textContent = 'Chưa tải được thư viện tạo file Word. Tải lại trang rồi thử lại.'; return; }
+  const p = current.plan, ti = p.thong_tin || {}, md = p.muc_dich_yeu_cau || {}, cb = p.chuan_bi || {};
+  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, AlignmentType, BorderStyle, UnderlineType } = docx;
+  const FONT = 'Times New Roman', SIZE = 26, W = 11906 - 1701 - 1134;
+  const run = (t, o = {}) => new TextRun({ text: String(t ?? ''), font: FONT, size: SIZE, ...o });
+  const para = (c, o = {}) => new Paragraph({ children: Array.isArray(c) ? c : [run(c)], spacing: { after: 60, line: 288 }, alignment: AlignmentType.JUSTIFIED, ...o });
+  const head = (t) => para([run(t, { bold: true })], { spacing: { before: 200, after: 80 } });
+  const sub = (t) => para([run(t, { bold: true, italics: true })], { spacing: { before: 100, after: 40 } });
+  const labeled = (label, v, indent = 284, mark = '-') => {
+    const xs = toList(v); if (!xs.length) return [];
+    if (xs.length === 1) return [para([run(`${mark} ${label}: `, { bold: true }), run(xs[0])], { indent: { left: indent } })];
+    return [para([run(`${mark} ${label}:`, { bold: true })], { indent: { left: indent } }), ...xs.map((x) => para('+ ' + x, { indent: { left: indent + 360 } }))];
+  };
+  const bullets = (v) => toList(v).map((x) => para('- ' + x, { indent: { left: 284 } }));
+  const ch = [para([run('GIÁO ÁN STEAM', { bold: true, size: 32 })], { alignment: AlignmentType.CENTER, spacing: { after: 200 } })];
+  [['Tên hoạt động', ti.ten_hoat_dong], ['Chủ đề', ti.chu_de], ['Lĩnh vực', ti.linh_vuc], ['Độ tuổi', ti.do_tuoi], ['Thời gian', ti.thoi_gian], ['Hình thức', ti.hinh_thuc], ['Quy trình', ti.quy_trinh], ['Áp dụng STEAM', ti.muc_do_steam]]
+    .forEach(([k, v]) => v && ch.push(para([run(k + ': ', { bold: true }), run(v)])));
+  ch.push(head('I. MỤC ĐÍCH - YÊU CẦU'), sub('1. Kiến thức'));
+  STEAM.forEach(([k, en]) => ch.push(...labeled(`${k} – ${en}`, toList(md.kien_thuc?.[k]).length ? md.kien_thuc[k] : 'Không áp dụng.')));
+  ch.push(sub('2. Kỹ năng'), para([run("- Nhóm kỹ năng 4C's:", { bold: true })], { indent: { left: 284 } }));
+  SKILLS.forEach(([k, l]) => ch.push(...labeled(l, md.ky_nang?.[k], 644, '+')));
+  ch.push(...labeled('Kỹ năng khác', md.ky_nang?.ky_nang_khac), sub('3. Thái độ'), ...bullets(md.thai_do));
+  ch.push(head('II. CHUẨN BỊ'), sub('1. Chuẩn bị của Cô'));
+  PREP_CO.forEach(([k, l]) => ch.push(...labeled(l, cb.co?.[k])));
+  ch.push(sub('2. Chuẩn bị của Trẻ'));
+  PREP_TRE.forEach(([k, l]) => ch.push(...labeled(l, cb.tre?.[k])));
+  if (toList(cb.phu_huynh).length) ch.push(sub('3. Phối hợp chuẩn bị với Phụ huynh học sinh'), ...bullets(cb.phu_huynh));
+  ch.push(head('III. CÁCH TIẾN HÀNH'));
+  const border = { style: BorderStyle.SINGLE, size: 4, color: '000000' };
+  const m = { top: 80, bottom: 80, left: 110, right: 110 };
+  const cell = (children, shade) => new TableCell({ children: children.length ? children : [para('')], width: { size: W / 2, type: WidthType.DXA }, margins: m, ...(shade ? { shading: { fill: 'F2F2F2' } } : {}) });
+  const left = (s) => {
+    const out = [para([run(`${s.ten_buoc}${s.thoi_gian ? ` (${s.thoi_gian})` : ''}`, { bold: true, underline: { type: UnderlineType.SINGLE } })], { alignment: AlignmentType.LEFT })];
+    if (s.muc_dich) out.push(para([run('Mục đích: ', { bold: true, italics: true }), run(s.muc_dich, { italics: true })], { alignment: AlignmentType.LEFT }));
+    (s.luot || []).forEach((t) => lines(t.co).forEach((x) => out.push(para(x, { alignment: AlignmentType.LEFT }))));
+    if (s.tich_hop_steam) out.push(para([run('→ Tích hợp STEAM: ' + s.tich_hop_steam, { italics: true })], { alignment: AlignmentType.LEFT }));
+    return out;
+  };
+  const right = (s) => [para(''), ...(s.luot || []).flatMap((t) => lines(t.tre).map((x) => para(x, { alignment: AlignmentType.LEFT })))];
+  ch.push(new Table({
+    width: { size: W, type: WidthType.DXA }, columnWidths: [W / 2, W / 2],
+    borders: { top: border, bottom: border, left: border, right: border, insideHorizontal: border, insideVertical: border },
+    rows: [
+      new TableRow({ tableHeader: true, children: ['Hoạt động của Cô', 'Hoạt động của Trẻ'].map((t) => cell([para([run(t, { bold: true })], { alignment: AlignmentType.CENTER })], true)) }),
+      ...(p.cach_tien_hanh || []).map((s) => new TableRow({ children: [cell(left(s)), cell(right(s))] }))
+    ]
+  }));
+  const doc = new Document({
+    creator: 'Vườn Ươm STEAM', title: ti.ten_hoat_dong || 'Giáo án STEAM',
+    styles: { default: { document: { run: { font: FONT, size: SIZE } } } },
+    sections: [{ properties: { page: { size: { width: 11906, height: 16838 }, margin: { top: 1134, bottom: 1134, left: 1701, right: 1134 } } }, children: ch }]
+  });
+  const btn = $('wordBtn'); btn.disabled = true; note.textContent = 'Đang tạo file Word…';
+  try {
+    const blob = await Packer.toBlob(doc);
+    const r = await downloads.save({ filename: 'GiaoAn_STEAM_' + slug(ti.ten_hoat_dong) + '.docx', data: blob });
+    note.textContent = r?.status === 'saved' ? 'Đã lưu file Word.' : 'Đã gửi file Word để bạn lưu.';
+  } catch (e) {
+    note.textContent = e?.code === 'declined' ? 'Bạn đã huỷ lưu file.' : e?.code === 'not_granted' ? 'Bạn chưa cho phép trang lưu file.' : 'Không lưu được file Word. Hãy dùng nút Sao chép.';
+  } finally { btn.disabled = false; }
+}
+
+render();
+renderHistory();
+</script>

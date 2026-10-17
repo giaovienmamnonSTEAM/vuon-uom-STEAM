@@ -63,3 +63,11 @@ Với Vercel: **Add New Project** → chọn repo → giữ nguyên Build Comman
 ## 📄 Giấy phép
 
 Dự án nội bộ phục vụ giảng dạy mầm non. Vui lòng không phát hành lại nội dung mà không ghi rõ nguồn.
+
+## 🤖 Bản chạy trực tiếp trên Claude (không cần Vercel, không cần API key)
+
+`claude-artifact/vuon-uom-steam.html` là phiên bản dạng Artifact trên claude.ai: giáo viên chỉ chọn **độ tuổi**, nhập **chủ đề** và **tên đề tài**; trang tự hỏi Claude (bằng tài khoản Claude của người đang dùng) để soạn giáo án 3 phần theo khung Thầy Phúc, cho sửa trực tiếp và tải file Word.
+
+Link: https://claude.ai/artifact/EA94KKnMF3JNPVMfygtxgW (chủ tài khoản chia sẻ qua menu Share của trang).
+
+File này được tạo tự động: bộ quy tắc soạn giáo án nằm ngay trong file (biến `PROMPT1`, `PROMPT2`); muốn sửa quy tắc thì sửa hai chuỗi đó.
