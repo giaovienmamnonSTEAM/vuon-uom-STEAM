@@ -52,3 +52,18 @@ test('từ ngữ phán xét', () => {
   assert.equal(findHarshWords('Con khám phá rất giỏi').length, 0);
   assert.ok(findHarshWords('Con hay đánh bạn và lười ăn').length >= 2);
 });
+
+import { generateThuMoi } from '../src/lib/templates/thuMoi.js';
+
+test('thư mời không tự thêm quốc hiệu, người ký khi chưa cung cấp', () => {
+  const r = generateThuMoi({ loai: 'steam', tenSuKien: 'Ngày hội STEAM', thoiGian: '8h ngày 15/11', quocHieu: 'khong' }, {}, 0);
+  assert.ok(!r.text.includes('CỘNG HÒA'));
+  assert.ok(!r.text.includes('HIỆU TRƯỞNG') && !r.text.includes('Ký, ghi rõ'));
+  assert.ok(r.text.includes('8h ngày 15/11'));
+  assert.ok(r.text.includes('[CẦN BỔ SUNG: Địa điểm]'));
+});
+
+test('mở rộng theo quy tắc giữ dữ kiện', () => {
+  const r = applyEditAction('mo-rong', 'Lớp nghỉ ngày 21/11 lúc 7h30.', {}, 0);
+  assert.ok(r.text.includes('21/11') && r.text.includes('7h30') && r.text.length > 40);
+});

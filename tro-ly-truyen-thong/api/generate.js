@@ -10,7 +10,7 @@
 //                      "Thiết lập thông tin" mới dùng được AI (tránh người lạ dùng tốn phí)
 
 import Anthropic from '@anthropic-ai/sdk';
-import { SYSTEM_PROMPT, TASKS, buildUserMessage, cleanOutput } from './_lib/prompts.js';
+import { SYSTEM_PROMPT, TASKS, buildUserMessage, cleanOutput, parseOutput, isValidEditAction } from './_lib/prompts.js';
 
 const DEFAULT_MODEL = 'claude-opus-5-5';
 
@@ -57,7 +57,11 @@ export default async function handler(req, res) {
   }
   const { task } = body || {};
   if (!TASKS.includes(task)) return sendJson(res, 400, { error: 'Loại nội dung không hợp lệ.' });
-  if (task === 'bien-tap' && !String(body.text || '').trim()) return sendJson(res, 400, { error: 'Chưa có văn bản để biên tập.' });
+  if (task === 'bien-tap') {
+    if (!String(body.text || '').trim()) return sendJson(res, 400, { error: 'Chưa có văn bản để biên tập.' });
+    if (!isValidEditAction(body.action)) return sendJson(res, 400, { error: 'Thao tác biên tập không hợp lệ.' });
+    if (body.action === 'tuy-chinh' && !String(body.instruction || '').trim()) return sendJson(res, 400, { error: 'Hãy ghi yêu cầu chỉnh sửa.' });
+  }
 
   const userMsg = buildUserMessage({
     task,
@@ -66,6 +70,7 @@ export default async function handler(req, res) {
     settings: body.settings || {},
     action: body.action,
     text: body.text,
+    instruction: body.instruction,
     variant: Number(body.variant) || 0
   });
 
@@ -78,7 +83,7 @@ export default async function handler(req, res) {
       max_tokens: 8000,
       betas: ['server-side-fallback-2026-07-01'],
       fallbacks: 'default',
-      output_config: { effort: 'low' },
+      output_config: { effort: 'medium' },
       system: SYSTEM_PROMPT,
       messages: [{ role: 'user', content: userMsg }]
     });
@@ -86,14 +91,15 @@ export default async function handler(req, res) {
     if (response.stop_reason === 'refusal') {
       return sendJson(res, 422, { error: 'AI không thể soạn nội dung này. Hãy diễn đạt lại thông tin hoặc dùng chế độ soạn theo mẫu.' });
     }
-    const text = cleanOutput(
+    const { text, notes } = parseOutput(
       response.content
         .filter((b) => b.type === 'text')
         .map((b) => b.text)
         .join('')
     );
-    if (!text) return sendJson(res, 502, { error: 'AI không trả về nội dung. Vui lòng thử lại.' });
-    return sendJson(res, 200, { text, model: response.model, truncated: response.stop_reason === 'max_tokens' });
+    if (!text) return sendJson(res, 502, { error: 'AI không trả về nội dung. Vui lòng thử lại.', code: 'empty' });
+    // Không ghi log nội dung (có thể chứa thông tin của phụ huynh, trẻ).
+    return sendJson(res, 200, { text, notes, model: response.model, truncated: response.stop_reason === 'max_tokens' });
   } catch (err) {
     if (err instanceof Anthropic.AuthenticationError) {
       return sendJson(res, 500, { error: 'API key trên máy chủ không hợp lệ. Quản trị viên cần kiểm tra ANTHROPIC_API_KEY.' });

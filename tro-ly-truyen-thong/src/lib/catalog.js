@@ -123,6 +123,7 @@ export const MODULES = [
         suggestions: ['Quý phụ huynh lớp', 'Toàn thể phụ huynh học sinh nhà trường', 'Phụ huynh các lớp mẫu giáo', 'Phụ huynh các nhóm nhà trẻ']
       },
       { name: 'tieuDe', label: 'Tiêu đề', type: 'text', placeholder: 'VD: Lịch nghỉ Tết Dương lịch' },
+      { name: 'lyDo', label: 'Lý do / mục đích (nếu có)', type: 'text', placeholder: 'VD: Theo kế hoạch năm học của nhà trường' },
       { name: 'noiDung', label: 'Nội dung chính', type: 'textarea', rows: 4, required: true, placeholder: 'Ghi các ý chính, mỗi ý một dòng.' },
       { name: 'thoiGian', label: 'Thời gian', type: 'text', placeholder: 'VD: Từ thứ Năm 01/01 đến hết Chủ nhật 04/01' },
       { name: 'diaDiem', label: 'Địa điểm', type: 'text', placeholder: 'VD: Phòng học lớp A1' },
@@ -137,6 +138,7 @@ export const MODULES = [
       tenLop: 'Mẫu giáo lớn A1',
       doiTuong: 'Quý phụ huynh lớp Mẫu giáo lớn A1',
       tieuDe: 'Lịch nghỉ Tết Dương lịch',
+      lyDo: '',
       noiDung: 'Các con được nghỉ học dịp Tết Dương lịch theo kế hoạch của nhà trường\nCác con đi học trở lại bình thường vào thứ Hai, ngày 05/01',
       thoiGian: 'Từ thứ Năm, ngày 01/01 đến hết Chủ nhật, ngày 04/01',
       diaDiem: '',
@@ -163,7 +165,7 @@ export const MODULES = [
       },
       { name: 'tenGiaoVien', label: 'Tên giáo viên (người gửi)', type: 'text', fromSettings: 'tenGiaoVien', placeholder: 'VD: cô Lan' },
       { name: 'tenLop', label: 'Tên lớp', type: 'text', fromSettings: 'tenLop' },
-      { name: 'noiDung', label: 'Nội dung cần trao đổi', type: 'textarea', rows: 4, required: true, placeholder: 'Ghi điều cần nói, mỗi ý một dòng. Nên mô tả việc cụ thể, tránh từ ngữ nhận xét về tính cách của trẻ.' },
+      { name: 'noiDung', label: 'Nội dung cần trao đổi', type: 'textarea', rows: 4, required: true, placeholder: 'Ghi điều cần nói, mỗi ý một dòng. Nên mô tả việc cụ thể, tránh từ ngữ nhận xét về tính cách của trẻ.', hint: 'Nên gọi trẻ bằng tên ở nhà hoặc chữ cái đầu, không ghi họ tên đầy đủ hay thông tin bệnh lý chi tiết.' },
       { name: 'thoiGian', label: 'Thời gian / hạn (nếu có)', type: 'text', placeholder: 'VD: Sáng thứ Hai, ngày 15/9' },
       { name: 'phongCach', label: 'Phong cách', type: 'chips', options: STYLES, required: true }
     ],
@@ -197,6 +199,10 @@ export const MODULES = [
       { name: 'chuongTrinh', label: 'Nội dung chương trình (nếu có)', type: 'textarea', rows: 3, placeholder: 'Mỗi nội dung một dòng.' },
       { name: 'luuY', label: 'Lưu ý (nếu có)', type: 'textarea', rows: 2, placeholder: 'VD: Trang phục, giờ đón trẻ…' },
       { name: 'loiKet', label: 'Lời kết (để trống để dùng lời kết gợi ý)', type: 'textarea', rows: 2 },
+      {
+        name: 'quocHieu', label: 'Ghi quốc hiệu, tiêu ngữ', type: 'chips', required: true,
+        options: [{ value: 'khong', label: 'Không' }, { value: 'co', label: 'Có (văn bản hành chính)' }]
+      },
       { name: 'diaDanhNgay', label: 'Địa danh, ngày ký (nếu có)', type: 'text', placeholder: 'VD: Bắc Ninh, ngày 25 tháng 8 năm 2026' },
       {
         name: 'chucVuKy', label: 'Chức vụ người ký', type: 'text',
@@ -205,7 +211,7 @@ export const MODULES = [
       },
       { name: 'nguoiKy', label: 'Họ tên người ký (nếu có)', type: 'text' }
     ],
-    defaults: { loai: 'khai-giang' },
+    defaults: { loai: 'khai-giang', quocHieu: 'khong' },
     sample: {
       loai: 'khai-giang',
       donViChuQuan: 'UBND xã Hòa Bình (mẫu)',
@@ -217,6 +223,7 @@ export const MODULES = [
       chuongTrinh: 'Văn nghệ chào mừng của các bé\nĐọc thư của Chủ tịch nước gửi ngành Giáo dục\nĐánh trống khai giảng năm học mới',
       luuY: 'Các bé mặc đồng phục của trường, có mặt tại lớp trước 7h15',
       loiKet: '',
+      quocHieu: 'co',
       diaDanhNgay: '',
       chucVuKy: 'HIỆU TRƯỞNG',
       nguoiKy: ''
@@ -276,15 +283,24 @@ export const MODULES = [
           { value: 'bang-tin', label: 'Bảng tin (gạch đầu dòng)' }
         ]
       },
+      { name: 'mucTieu', label: 'Mục tiêu (nếu có)', type: 'text', placeholder: 'VD: Giúp bố mẹ cho con ăn đủ chất mà không ép' },
+      {
+        name: 'doiTuongDoc', label: 'Đối tượng đọc', type: 'text', placeholder: 'VD: Bố mẹ, ông bà trông cháu',
+        suggestions: ['Bố mẹ', 'Ông bà trông cháu', 'Cả gia đình', 'Phụ huynh có con mới đi học']
+      },
+      { name: 'doDai', label: 'Độ dài', type: 'chips', options: LENGTHS, required: true },
       { name: 'boiCanh', label: 'Bối cảnh / lưu ý thêm (nếu có)', type: 'textarea', rows: 2, placeholder: 'VD: Thời tiết chuyển lạnh; lớp đang thực hiện chủ đề "Bé và gia đình"…' },
       { name: 'tenTruong', label: 'Tên trường (để ký cuối bài, nếu cần)', type: 'text', fromSettings: 'tenTruong' },
       { name: 'tenLop', label: 'Tên lớp (nếu cần)', type: 'text', fromSettings: 'tenLop' }
     ],
-    defaults: { doTuoi: '3-4', chuDe: 'dinh-duong', hinhThuc: 'bai-viet' },
+    defaults: { doTuoi: '3-4', chuDe: 'dinh-duong', hinhThuc: 'bai-viet', doDai: 'vua' },
     sample: {
       doTuoi: '4-5',
       chuDe: 'tai-nan',
       hinhThuc: 'bai-viet',
+      mucTieu: 'Giúp gia đình giữ an toàn cho trẻ khi ở nhà dịp hè',
+      doiTuongDoc: 'Bố mẹ, ông bà trông cháu',
+      doDai: 'vua',
       boiCanh: 'Chuẩn bị đến kỳ nghỉ hè, trẻ ở nhà nhiều hơn',
       tenTruong: 'Trường Mầm non Ánh Dương (mẫu)',
       tenLop: ''
@@ -331,6 +347,7 @@ export const EDIT_ACTIONS = [
   { value: 'sua-chinh-ta', label: 'Sửa lỗi chính tả', icon: '✔️' },
   { value: 'than-thien', label: 'Viết lại thân thiện hơn', icon: '😊' },
   { value: 'rut-gon', label: 'Rút gọn', icon: '✂️' },
+  { value: 'mo-rong', label: 'Mở rộng', icon: '➕' },
   { value: 'trang-trong', label: 'Trang trọng hơn', icon: '🎩' },
   { value: 'ro-rang', label: 'Rõ ràng, dễ hiểu hơn', icon: '💡' },
   { value: 'zalo', label: 'Chuyển thành tin nhắn Zalo', icon: '📱' },

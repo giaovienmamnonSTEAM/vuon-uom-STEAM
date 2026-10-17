@@ -370,7 +370,7 @@ export function toOfficialNotice(text, settings = {}) {
   body = body.replace(TRAILING_THANKS_RE, '');
   const out = blocks(
     lines(truong && upper(truong), lop && `Lớp: ${lop}`),
-    lines('THÔNG BÁO', subject ? `V/v: ${subject}` : 'V/v: [Nội dung thông báo]'),
+    lines('THÔNG BÁO', subject ? `V/v: ${subject}` : 'V/v: [CẦN BỔ SUNG: nội dung thông báo]'),
     `Kính gửi: Quý phụ huynh${lop ? ' lớp ' + lop : ''}.`,
     body.trim(),
     'Trân trọng thông báo!',
@@ -387,10 +387,10 @@ export function toAdministrative(text, settings = {}) {
   if (subject) body = body.replace(subject, '').replace(/^\s*\n/, '');
   body = body.replace(TRAILING_THANKS_RE, '');
   const out = blocks(
-    lines(chuQuan ? upper(chuQuan) : '[ĐƠN VỊ CHỦ QUẢN]', truong ? upper(truong) : '[TÊN TRƯỜNG]', 'Số: …/TB-…'),
+    lines(chuQuan ? upper(chuQuan) : '[CẦN BỔ SUNG: đơn vị chủ quản]', truong ? upper(truong) : '[CẦN BỔ SUNG: tên trường]', 'Số: …/TB-…'),
     lines('CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM', 'Độc lập – Tự do – Hạnh phúc'),
     '…, ngày … tháng … năm …',
-    lines('THÔNG BÁO', subject ? `Về việc ${subject.charAt(0).toLocaleLowerCase('vi') + subject.slice(1)}` : 'Về việc [nội dung]'),
+    lines('THÔNG BÁO', subject ? `Về việc ${subject.charAt(0).toLocaleLowerCase('vi') + subject.slice(1)}` : 'Về việc [CẦN BỔ SUNG: trích yếu]'),
     'Kính gửi: Quý phụ huynh học sinh.',
     body.trim(),
     'Đề nghị Quý phụ huynh quan tâm, phối hợp thực hiện./.',
@@ -399,7 +399,19 @@ export function toAdministrative(text, settings = {}) {
   );
   return {
     text: out,
-    notes: ['Đã trình bày theo bố cục văn bản hành chính (quốc hiệu, tiêu ngữ, số, ngày, trích yếu, nơi nhận). Các chỗ “…” và [ ] cần điền theo văn bản thật của nhà trường.']
+    notes: ['Đã trình bày theo bố cục văn bản hành chính (quốc hiệu, tiêu ngữ, số, ngày, trích yếu, nơi nhận). Các chỗ “…” và [CẦN BỔ SUNG] cần điền theo văn bản thật của nhà trường.']
+  };
+}
+
+// Mở rộng theo quy tắc: chỉ thêm lời chào, lời cảm ơn và dòng tóm tắt ngày giờ; không thêm dữ kiện.
+export function expand(text, variant = 0) {
+  const friendly = makeFriendly(text, variant).text;
+  const withMemo = clarify(friendly).text;
+  return {
+    text: withMemo,
+    notes: [
+      'Chế độ không dùng AI chỉ mở rộng được phần hình thức (lời chào, lời cảm ơn, dòng “Ghi nhớ” ngày giờ). Muốn diễn giải thêm ý, hãy dùng AI hoặc tự bổ sung.'
+    ]
   };
 }
 
@@ -427,6 +439,7 @@ export function applyEditAction(action, text, settings = {}, variant = 0) {
     case 'sua-chinh-ta': return fixSpelling(src);
     case 'than-thien': return makeFriendly(src, variant);
     case 'rut-gon': return shorten(src);
+    case 'mo-rong': return expand(src, variant);
     case 'trang-trong': return makeFormal(src);
     case 'ro-rang': return clarify(src);
     case 'zalo': return toZalo(src, settings, variant);

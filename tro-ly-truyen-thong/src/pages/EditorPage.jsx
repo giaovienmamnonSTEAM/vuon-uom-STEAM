@@ -14,7 +14,7 @@ export default function EditorPage({ state, setState, settings, ai, onSaved, onU
   const saveTimer = useRef(null);
   const usingAI = ai.enabled && ai.connected;
 
-  async function run(action, { kind = 'new', forceTemplate = false, source } = {}) {
+  async function run(action, { kind = 'new', forceTemplate = false, source, instruction } = {}) {
     const text = source ?? state.input;
     if (!text?.trim()) {
       const m = 'Vui lòng dán hoặc nhập văn bản cần biên tập.';
@@ -27,18 +27,18 @@ export default function EditorPage({ state, setState, settings, ai, onSaved, onU
     setBusy(kind === 'new' ? action : kind);
     const variant = kind === 'regen' ? (state.variant || 0) + 1 : 0;
     try {
-      const out = await editContent({ action, text, settings, variant, ai: forceTemplate ? { enabled: false } : ai });
+      const out = await editContent({ action, text, settings, variant, instruction, ai: forceTemplate ? { enabled: false } : ai });
       let historyId = state.historyId;
       if (kind === 'new' || !historyId) {
         historyId = onSaved({ type: 'bien-tap', title: out.title, text: out.text, data: { input: state.input, action }, source: out.source });
       } else {
         onUpdateHistory(historyId, { text: out.text });
       }
-      setState((s) => ({ ...s, output: out, lastAction: kind === 'shorten' ? s.lastAction : action, variant, historyId }));
+      setState((s) => ({ ...s, output: out, lastAction: ['shorten', 'rewrite'].includes(kind) ? s.lastAction : action, variant, historyId }));
       if (kind === 'new') setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
     } catch (e) {
       setError(e.message || 'Không biên tập được bằng AI.');
-      setFailed({ action, kind, source });
+      setFailed({ action, kind, source, instruction });
     } finally {
       setBusy(null);
     }
@@ -100,7 +100,12 @@ export default function EditorPage({ state, setState, settings, ai, onSaved, onU
           <div className="flex flex-col gap-2 rounded-xl bg-red-50 px-4 py-3 text-[15px] text-red-800 ring-1 ring-red-200 sm:flex-row sm:items-center sm:justify-between" role="alert">
             <span>⚠️ {error}</span>
             {failed && (
-              <button className="btn-soft shrink-0" onClick={() => run(failed.action, { kind: failed.kind, source: failed.source, forceTemplate: true })}>📋 Biên tập theo quy tắc</button>
+              <div className="flex shrink-0 flex-wrap gap-2">
+                <button className="btn-primary" disabled={!!busy} onClick={() => run(failed.action, { kind: failed.kind, source: failed.source, instruction: failed.instruction })}>🔁 Thử lại</button>
+                {failed.action !== 'tuy-chinh' && (
+                  <button className="btn-soft" disabled={!!busy} onClick={() => run(failed.action, { kind: failed.kind, source: failed.source, forceTemplate: true })}>📋 Biên tập theo quy tắc</button>
+                )}
+              </div>
             )}
           </div>
         )}
@@ -109,7 +114,9 @@ export default function EditorPage({ state, setState, settings, ai, onSaved, onU
       <div ref={resultRef} className="scroll-mt-20">
         <OutputPanel
           output={state.output}
-          busy={busy && ['regen', 'shorten'].includes(busy) ? busy : busy ? 'new' : null}
+          busy={busy && ['regen', 'shorten', 'rewrite'].includes(busy) ? busy : busy ? 'new' : null}
+          usingAI={usingAI}
+          onRewrite={(action, instruction) => run(action, { kind: 'rewrite', source: state.output?.text, instruction })}
           onTextChange={onTextChange}
           onClear={() => setState((s) => ({ ...s, output: null, historyId: null, variant: 0 }))}
           onRegenerate={() => run(state.lastAction || 'than-thien', { kind: 'regen' })}

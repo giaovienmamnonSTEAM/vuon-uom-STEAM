@@ -54,6 +54,7 @@ export function generateThongBao(d, settings = {}, variant = 0) {
   const noiDung = splitItems(d.noiDung);
   const phoiHop = splitItems(d.phoiHop);
   const isKhan = d.loai === 'khan';
+  const lyDo = t(d.lyDo);
   const sdt = t(settings.soDienThoai);
   const gv = t(settings.tenGiaoVien);
   const notes = [];
@@ -67,6 +68,7 @@ export function generateThongBao(d, settings = {}, variant = 0) {
       `${isKhan ? '❗ THÔNG BÁO KHẨN' : '📢 THÔNG BÁO'}: ${upper(tieuDe)}`,
       lines(
         `Kính gửi: ${doiTuong}`,
+        lyDo && `- Lý do: ${sentence(lyDo)}`,
         noiDung.length === 1 ? `- Nội dung: ${sentence(noiDung[0])}` : noiDung.map((x) => `- ${sentence(x)}`),
         t(d.thoiGian) && `- Thời gian: ${t(d.thoiGian)}`,
         t(d.diaDiem) && `- Địa điểm: ${t(d.diaDiem)}`,
@@ -88,6 +90,7 @@ export function generateThongBao(d, settings = {}, variant = 0) {
     text = blocks(
       `${isKhan ? '❗ THÔNG BÁO KHẨN' : '🌼 THÔNG BÁO'}: ${tieuDe}`,
       greet,
+      lyDo && sentence(lyDo),
       intro,
       lines(
         noiDung.map((x) => `🔹 ${sentence(x)}`),
@@ -123,6 +126,7 @@ export function generateThongBao(d, settings = {}, variant = 0) {
       lines(truong && upper(truong), lop && `Lớp: ${lop}`),
       lines(isKhan ? 'THÔNG BÁO KHẨN' : 'THÔNG BÁO', `V/v: ${tieuDe}`),
       `Kính gửi: ${doiTuong}.`.replace(/\.\.$/, '.'),
+      lyDo && sentence(lyDo),
       intro,
       items.join('\n'),
       pick(info.close, variant),

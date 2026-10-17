@@ -69,15 +69,17 @@ export function generateThuMoi(d, settings = {}, variant = 0) {
   const khach = t(d.thanhPhan) || info.defaultGuest;
   const ct = splitItems(d.chuongTrinh);
   const luuY = splitItems(d.luuY);
-  const chucVu = upper(d.chucVuKy) || (truong ? 'T/M BAN GIÁM HIỆU' : 'BAN TỔ CHỨC');
-  const ngay = t(d.diaDanhNgay) || '…, ngày … tháng … năm …';
+  // Không tự thêm quốc hiệu, đơn vị chủ quản, người ký: chỉ ghi khi giáo viên cung cấp.
+  const coQuocHieu = d.quocHieu === 'co';
+  const chucVu = upper(d.chucVuKy);
+  const ngay = t(d.diaDanhNgay) || (coQuocHieu ? mc.need('', 'địa danh, ngày ký') : '');
 
   const loiKet = t(d.loiKet) ? sentence(d.loiKet) : pick(info.close, variant);
   const tenSK = suKien.charAt(0).toLocaleUpperCase('vi') + suKien.slice(1);
 
   const text = blocks(
-    lines(chuQuan && upper(chuQuan), truong ? upper(truong) : '[TÊN TRƯỜNG]'),
-    lines('CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM', 'Độc lập – Tự do – Hạnh phúc'),
+    lines(chuQuan && upper(chuQuan), truong && upper(truong)),
+    coQuocHieu && lines('CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM', 'Độc lập – Tự do – Hạnh phúc'),
     ngay,
     lines(info.heading, upper(tenSK)),
     `${pick(['Trân trọng kính mời', 'Trân trọng kính mời'], variant)}: ${khach}`,
@@ -87,11 +89,11 @@ export function generateThuMoi(d, settings = {}, variant = 0) {
     luuY.length > 0 && lines('Lưu ý:', luuY.map((x) => `- ${sentence(x)}`)),
     loiKet,
     'Trân trọng kính mời!',
-    lines(chucVu, t(d.nguoiKy) ? '' : '(Ký, ghi rõ họ tên)', t(d.nguoiKy))
+    (chucVu || t(d.nguoiKy)) && lines(chucVu, chucVu && !t(d.nguoiKy) ? '(Ký, ghi rõ họ tên)' : '', t(d.nguoiKy))
   );
 
   const notes = [];
-  if (mc.missing.length) notes.push(`Còn thiếu: ${mc.missing.join(', ')} — đã để [chỗ trống] để bạn điền.`);
+  if (mc.missing.length) notes.push(`Còn thiếu: ${mc.missing.join(', ')} — đã đánh dấu [CẦN BỔ SUNG] để bạn điền.`);
   notes.push('Mẹo: khi dán sang Word, căn giữa phần quốc hiệu, tiêu đề và khối ký tên; trên Canva, dán từng khối vào ô chữ riêng.');
   return { text, title: `Thư mời: ${tenSK}`, notes, missing: mc.missing };
 }

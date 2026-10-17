@@ -41,6 +41,16 @@ Khung kết quả có: **Sao chép · Chỉnh sửa · Rút gọn · Phiên bả
 
 Mỗi kết quả và mỗi mục lịch sử đều có nhãn **“Soạn bằng AI”** hoặc **“Soạn theo mẫu”**.
 
+### Bộ não AI (`api/_lib/prompts.js`)
+
+Một tệp prompt dùng chung cho cả hai đường gọi AI (Claude trên claude.ai và hàm máy chủ):
+- Vai trò: trợ lý truyền thông chuyên nghiệp của giáo viên mầm non Việt Nam; quy tắc về chính tả, giọng văn tự nhiên, không bịa dữ kiện, không chẩn đoán, tôn trọng phụ huynh và trẻ.
+- Hướng dẫn riêng cho từng chức năng (thông báo, tin nhắn, thư mời, bản tin tuần, tuyên truyền, truyền thông, 11 kiểu biên tập).
+- Dùng thông tin trong Thiết lập (trường, lớp, giáo viên…) khi phù hợp.
+- Thiếu thông tin quan trọng → AI đặt `[CẦN BỔ SUNG: …]`; ứng dụng đếm và nhắc số chỗ cần điền.
+- AI trả thêm phần ghi chú riêng cho giáo viên (thông tin thiếu, ý AI tự thêm cần kiểm tra); ứng dụng tách phần này ra, hiển thị dưới dạng “Ghi chú của AI”, không lẫn vào văn bản gửi phụ huynh.
+- Rút gọn / Viết lại / yêu cầu riêng luôn gửi **văn bản hiện tại** (kể cả phần giáo viên đã sửa tay) kèm yêu cầu, không soạn lại từ đầu. Lỗi thì giữ nguyên văn bản cũ, có nút **Thử lại**.
+
 ### Bật AI khi tự đưa lên Vercel (không bắt buộc)
 
 1. Trên Vercel: **Add New Project** → chọn repo → **Root Directory: `tro-ly-truyen-thong`** → Deploy.

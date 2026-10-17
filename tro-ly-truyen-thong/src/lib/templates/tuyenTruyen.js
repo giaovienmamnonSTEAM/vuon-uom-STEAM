@@ -13,7 +13,10 @@ export function generateTuyenTruyen(d, settings = {}, variant = 0) {
   const kt = KIEN_THUC[d.chuDe] || KIEN_THUC['dinh-duong'];
   const tuoi = labelOf(AGE_GROUPS, d.doTuoi) || '';
   const ageTips = kt.byAge[d.doTuoi] || [];
-  const tips = rotate(kt.tips, variant);
+  const doDai = d.doDai || 'vua';
+  const tips = rotate(kt.tips, variant).slice(0, doDai === 'ngan' ? 3 : doDai === 'vua' ? 4 : 5);
+  const mucTieu = t(d.mucTieu);
+  const doiTuongDoc = t(d.doiTuongDoc);
   const boiCanh = t(d.boiCanh);
   const truong = t(d.tenTruong);
   const lop = lopName(d.tenLop);
@@ -42,19 +45,14 @@ export function generateTuyenTruyen(d, settings = {}, variant = 0) {
       ky
     );
   } else {
-    const moDau = pick(
-      [
-        `Kính gửi Quý phụ huynh!`,
-        `Thưa các bậc phụ huynh!`,
-        `Kính thưa Quý phụ huynh!`
-      ],
-      variant
-    );
+    const moDau = doiTuongDoc
+      ? `Kính gửi ${doiTuongDoc.charAt(0).toLocaleUpperCase('vi') + doiTuongDoc.slice(1)}!`
+      : pick(['Kính gửi Quý phụ huynh!', 'Thưa các bậc phụ huynh!', 'Kính thưa Quý phụ huynh!'], variant);
     text = blocks(
       upper(kt.title),
       tuoi && `Bài tuyên truyền dành cho phụ huynh có con ${tuoi}`,
       moDau,
-      lines(kt.intro, boiCanh && sentence(boiCanh)),
+      lines(kt.intro, boiCanh && sentence(boiCanh), mucTieu && `Bài viết này mong muốn: ${sentence(mucTieu.charAt(0).toLocaleLowerCase('vi') + mucTieu.slice(1))}`),
       lines('1. Gia đình có thể làm gì?', tips.map((x) => `- ${x}`)),
       ageTips.length > 0 && lines(`2. Lưu ý riêng với trẻ ${tuoi}`, ageTips.map((x) => `- ${x}`)),
       kt.medical && lines(`${ageTips.length ? 3 : 2}. Khi nào cần hỏi ý kiến cán bộ y tế?`, kt.medical),

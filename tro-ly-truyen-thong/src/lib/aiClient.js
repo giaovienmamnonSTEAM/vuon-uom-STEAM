@@ -4,7 +4,7 @@
 // 2. Chạy trên máy chủ riêng (Vercel…): gọi hàm máy chủ /api/generate, API key
 //    nằm ở biến môi trường máy chủ, KHÔNG bao giờ ở trình duyệt.
 // Không đường nào khả dụng thì báo "chưa kết nối" — ứng dụng dùng chế độ soạn theo mẫu.
-import { SYSTEM_PROMPT, buildUserMessage, cleanOutput } from '../../api/_lib/prompts.js';
+import { SYSTEM_PROMPT, buildUserMessage, parseOutput } from '../../api/_lib/prompts.js';
 
 const STATUS_URL = '/api/status';
 const GENERATE_URL = '/api/generate';
@@ -63,10 +63,10 @@ const SAMPLE_ERRORS = {
 async function viaClaude(sample, payload, signal) {
   const userMsg = buildUserMessage(payload);
   try {
-    const { text, truncated } = await sample(`${SYSTEM_PROMPT}\n\n---\n\n${userMsg}`, { signal });
-    const clean = cleanOutput(text);
-    if (!clean) throw new AIError(SAMPLE_ERRORS.empty_completion, 'empty');
-    return { text: clean, truncated };
+    const { text, truncated } = await sample(`${SYSTEM_PROMPT}\n\n---\n\n${userMsg}`, { signal, modelTier: 'default' });
+    const out = parseOutput(text);
+    if (!out.text) throw new AIError(SAMPLE_ERRORS.empty_completion, 'empty');
+    return { ...out, truncated };
   } catch (e) {
     if (e instanceof AIError) throw e;
     const code = e?.code || 'upstream_error';
@@ -98,7 +98,7 @@ async function viaServer(payload, accessCode, signal) {
   return data;
 }
 
-// payload: { task, data, labels, settings, action, text, variant }
+// payload: { task, data, labels, settings, action, text, instruction, variant }
 export async function requestAI(payload, { accessCode, signal } = {}) {
   const sample = await getSample();
   if (sample) return viaClaude(sample, payload, signal);

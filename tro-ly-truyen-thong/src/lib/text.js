@@ -89,7 +89,7 @@ export function slugify(s) {
 
 // Chỗ trống để giáo viên tự điền (dùng khi thiếu thông tin quan trọng, KHÔNG tự bịa).
 export function blank(label) {
-  return `[${label}]`;
+  return `[CẦN BỔ SUNG: ${label}]`;
 }
 
 // Tạo bộ thu thập "thông tin còn thiếu" cho mỗi lần soạn.

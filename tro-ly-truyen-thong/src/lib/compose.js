@@ -46,18 +46,25 @@ export async function composeContent({ moduleId, data, settings, variant = 0, ai
     { task: moduleId, data, labels: selectLabels(mod, data), settings, variant },
     { accessCode: ai.accessCode, signal: ai.signal }
   );
-  const notes = [];
-  if (res.truncated) notes.push('Nội dung có thể bị cắt ngắn do quá dài. Hãy kiểm tra phần cuối.');
-  return { text: res.text, title: local.title, notes, source: 'ai' };
+  return { text: res.text, title: local.title, notes: aiNotes(res), source: 'ai' };
 }
 
-export async function editContent({ action, text, settings, variant = 0, ai }) {
-  const label = EDIT_ACTIONS.find((a) => a.value === action)?.label || 'Biên tập';
+// Ghi chú AI gửi riêng cho giáo viên (thông tin còn thiếu, ý AI tự thêm cần kiểm tra).
+function aiNotes(res) {
+  const notes = (res.notes || []).slice(0, 8).map((n) => `Ghi chú của AI: ${n}`);
+  if (res.truncated) notes.push('Nội dung có thể bị cắt ngắn do quá dài. Hãy kiểm tra phần cuối.');
+  return notes;
+}
+
+// instruction: yêu cầu chỉnh sửa riêng của giáo viên (action "tuy-chinh", chỉ chạy được khi có AI).
+export async function editContent({ action, text, settings, variant = 0, ai, instruction }) {
+  const label = action === 'tuy-chinh' ? 'Viết lại theo yêu cầu' : EDIT_ACTIONS.find((a) => a.value === action)?.label || 'Biên tập';
   const title = `${label}: ${firstLine(text, 50)}`;
   if (!shouldUseAI(ai)) {
+    if (action === 'tuy-chinh') throw new Error('Viết lại theo yêu cầu riêng cần có AI. Hãy chọn một kiểu viết lại có sẵn.');
     const r = applyEditAction(action, text, settings, variant);
     return { text: r.text, notes: r.notes, title, source: 'mau' };
   }
-  const res = await requestAI({ task: 'bien-tap', action, text, settings }, { accessCode: ai.accessCode, signal: ai.signal });
-  return { text: res.text, notes: [], title, source: 'ai' };
+  const res = await requestAI({ task: 'bien-tap', action, text, settings, instruction, variant }, { accessCode: ai.accessCode, signal: ai.signal });
+  return { text: res.text, notes: aiNotes(res), title, source: 'ai' };
 }

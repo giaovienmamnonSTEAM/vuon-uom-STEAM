@@ -3,12 +3,25 @@ import { useEffect, useRef, useState } from 'react';
 import { copyText, downloadTxt, printText, inClaude } from '../lib/exporters.js';
 import { Spinner, useUI } from './UI.jsx';
 
-export default function OutputPanel({ output, onTextChange, onClear, onRegenerate, onShorten, busy, emptyHint }) {
+// Các kiểu viết lại nhanh: áp lên văn bản đang có (không soạn lại từ đầu).
+const QUICK_REWRITES = [
+  { value: 'than-thien', label: '😊 Thân thiện hơn' },
+  { value: 'trang-trong', label: '🎩 Trang trọng hơn' },
+  { value: 'mo-rong', label: '➕ Mở rộng' },
+  { value: 'ro-rang', label: '💡 Rõ ràng hơn' },
+  { value: 'sua-chinh-ta', label: '✔️ Sửa chính tả' },
+  { value: 'zalo', label: '📱 Thành tin Zalo' }
+];
+
+export default function OutputPanel({ output, onTextChange, onClear, onRegenerate, onShorten, onRewrite, busy, emptyHint, usingAI }) {
   const { toast, confirm } = useUI();
   const [editing, setEditing] = useState(false);
+  const [rewriteOpen, setRewriteOpen] = useState(false);
+  const [instruction, setInstruction] = useState('');
   const taRef = useRef(null);
   const text = output?.text || '';
   const has = text.trim().length > 0;
+  const missingCount = (text.match(/\[CẦN BỔ SUNG/g) || []).length;
 
   useEffect(() => {
     if (editing && taRef.current) {
@@ -78,7 +91,7 @@ export default function OutputPanel({ output, onTextChange, onClear, onRegenerat
       <div className="relative">
         {busy && (
           <div className="absolute inset-0 z-10 flex items-center justify-center gap-2 bg-white/70 text-[15px] font-medium text-sky-800">
-            <Spinner /> Đang soạn nội dung…
+            <Spinner /> {usingAI ? 'AI đang viết… thường mất 10–60 giây' : 'Đang soạn nội dung…'}
           </div>
         )}
         {editing ? (
@@ -100,12 +113,52 @@ export default function OutputPanel({ output, onTextChange, onClear, onRegenerat
         )}
       </div>
 
+      {missingCount > 0 && (
+        <p className="border-t border-sky-100 bg-dao/40 px-4 py-2 text-sm font-medium text-orange-900">
+          ✍️ Còn {missingCount} chỗ đánh dấu [CẦN BỔ SUNG] — hãy điền trước khi gửi.
+        </p>
+      )}
+
       {output?.notes?.length > 0 && (
         <ul className="space-y-1 border-t border-sky-100 bg-kem px-4 py-3 text-sm text-slate-600">
           {output.notes.map((n, i) => (
             <li key={i}>💡 {n}</li>
           ))}
         </ul>
+      )}
+
+      {onRewrite && rewriteOpen && has && (
+        <div className="space-y-3 border-t border-sky-100 bg-sky-50/60 p-4">
+          <p className="text-sm font-semibold text-slate-700">Viết lại văn bản đang có (giữ nguyên ngày giờ, dữ kiện):</p>
+          <div className="flex flex-wrap gap-2">
+            {QUICK_REWRITES.map((r) => (
+              <button key={r.value} className="btn-ghost" disabled={!!busy} onClick={() => onRewrite(r.value)}>
+                {r.label}
+              </button>
+            ))}
+          </div>
+          <div>
+            <label htmlFor="rewrite-instruction" className="label">Yêu cầu riêng {usingAI ? '' : '(cần AI)'}</label>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <input
+                id="rewrite-instruction"
+                className="input sm:flex-1"
+                maxLength={500}
+                value={instruction}
+                disabled={!usingAI}
+                placeholder={usingAI ? 'VD: thêm câu nhắc bố mẹ mang áo mưa cho con; bỏ đoạn cuối' : 'Kết nối AI để ghi yêu cầu riêng'}
+                onChange={(e) => setInstruction(e.target.value)}
+              />
+              <button
+                className="btn-primary"
+                disabled={!usingAI || !instruction.trim() || !!busy}
+                onClick={() => onRewrite('tuy-chinh', instruction.trim())}
+              >
+                {busy === 'rewrite' ? <Spinner /> : '✨'} Viết lại theo yêu cầu
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       <div className="grid grid-cols-2 gap-2 border-t border-sky-100 p-3 sm:grid-cols-4">
@@ -116,9 +169,14 @@ export default function OutputPanel({ output, onTextChange, onClear, onRegenerat
         <button className="btn-soft" onClick={onShorten} disabled={!has || !!busy}>
           {busy === 'shorten' ? <Spinner /> : '✂️'} Rút gọn
         </button>
-        <button className="btn-soft" onClick={onRegenerate} disabled={!!busy}>
-          {busy === 'regen' ? <Spinner /> : '🔄'} Phiên bản mới
+        <button className="btn-soft" onClick={onRegenerate} disabled={!!busy} title="Soạn lại một phiên bản mới từ thông tin đã nhập">
+          {busy === 'regen' ? <Spinner /> : '🔄'} Tạo lại
         </button>
+        {onRewrite && (
+          <button className="btn-soft col-span-2 sm:col-span-4" onClick={() => setRewriteOpen((v) => !v)} disabled={!has || !!busy} aria-expanded={rewriteOpen}>
+            {busy === 'rewrite' ? <Spinner /> : '🪄'} Viết lại {rewriteOpen ? '▴' : '▾'}
+          </button>
+        )}
         <button className="btn-ghost" onClick={handleDownload} disabled={!has || !!busy}>⬇️ Tải .txt</button>
         <button className="btn-ghost" onClick={handlePrint} title={inClaude() ? 'Lưu bản in khổ A4 (.html) để mở và in' : 'In nội dung'} disabled={!has || !!busy}>🖨️ In</button>
         <button className="btn-danger col-span-2" onClick={handleClear} disabled={!has || !!busy}>🗑️ Xóa nội dung</button>
