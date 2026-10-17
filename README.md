@@ -6,6 +6,8 @@ Công cụ soạn giáo án STEAM mầm non cho Nhà trẻ (24–36 tháng), M�
 
 Tạo bởi **Trần Quỳ** – Giáo viên mầm non STEAM.
 
+> 📣 Repo này còn có ứng dụng **Trợ lý Truyền thông Mầm non** trong thư mục [`tro-ly-truyen-thong/`](tro-ly-truyen-thong/README.md) (soạn thông báo, tin nhắn, thư mời, bản tin tuần, tuyên truyền, bài truyền thông).
+
 ---
 
 ## ✨ Cách dùng

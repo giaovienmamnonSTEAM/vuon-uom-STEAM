@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body { @apply bg-kem text-slate-800 antialiased; }
+  :focus-visible { @apply outline-none ring-2 ring-sky-400 ring-offset-2 ring-offset-kem; }
+}
+
+@layer components {
+  .card { @apply rounded-2xl bg-white shadow-sm ring-1 ring-sky-100; }
+  .btn { @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl px-4 py-2 text-[15px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-50; }
+  .btn-primary { @apply btn bg-sky-500 text-white shadow-sm hover:bg-sky-600 active:bg-sky-700; }
+  .btn-soft { @apply btn bg-sky-50 text-sky-800 ring-1 ring-sky-200 hover:bg-sky-100; }
+  .btn-ghost { @apply btn bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50; }
+  .btn-danger { @apply btn bg-white text-red-700 ring-1 ring-red-200 hover:bg-red-50; }
+  .input { @apply block w-full rounded-xl border-0 bg-white px-3.5 py-2.5 text-[15px] text-slate-800 shadow-sm ring-1 ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-sky-400; }
+  .label { @apply mb-1.5 block text-[15px] font-semibold text-slate-700; }
+}
+
+.output-text { font-family: "Be Vietnam Pro", system-ui, sans-serif; white-space: pre-wrap; word-break: break-word; }
